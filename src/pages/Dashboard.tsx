@@ -4,6 +4,8 @@ import { FailureCategoryPie } from '../components/dashboard/FailureCategoryPie';
 import { RecentRuns } from '../components/dashboard/RecentRuns';
 import { ActiveDevices } from '../components/dashboard/ActiveDevices';
 import { AlertsFeed } from '../components/dashboard/AlertsFeed';
+import { HealthScore } from '../components/dashboard/HealthScore';
+import { ActivityTimeline } from '../components/dashboard/ActivityTimeline';
 import { useDashboardStats } from '../hooks/useDashboardStats';
 import { useTestRuns } from '../hooks/useTestRuns';
 import { useAuth } from '../contexts/AuthContext';
@@ -31,7 +33,8 @@ export function Dashboard() {
         <div className="lg:col-span-2">
           <PassFailChart data={passFailTrend} loading={statsLoading} />
         </div>
-        <div>
+        <div className="space-y-4">
+          <HealthScore />
           <FailureCategoryPie data={failureCategories} loading={statsLoading} />
         </div>
       </div>
@@ -43,6 +46,7 @@ export function Dashboard() {
         </div>
         <div className="space-y-4">
           <ActiveDevices />
+          <ActivityTimeline />
         </div>
       </div>
 

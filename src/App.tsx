@@ -14,11 +14,15 @@ import { NotFound } from './pages/NotFound';
 // Lazy load dashboard pages
 const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
 const TestRuns = lazy(() => import('./pages/TestRuns').then(m => ({ default: m.TestRuns })));
+const TestRunDetail = lazy(() => import('./pages/TestRunDetail').then(m => ({ default: m.TestRunDetail })));
+const CompareRuns = lazy(() => import('./pages/CompareRuns').then(m => ({ default: m.CompareRuns })));
 const CrashTriage = lazy(() => import('./pages/CrashTriage').then(m => ({ default: m.CrashTriage })));
 const LogExplorer = lazy(() => import('./pages/LogExplorer').then(m => ({ default: m.LogExplorer })));
 const Reports = lazy(() => import('./pages/Reports').then(m => ({ default: m.Reports })));
 const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
 const Devices = lazy(() => import('./pages/Devices').then(m => ({ default: m.Devices })));
+const Docs = lazy(() => import('./pages/Docs').then(m => ({ default: m.Docs })));
+const Onboarding = lazy(() => import('./pages/Onboarding').then(m => ({ default: m.Onboarding })));
 
 export function App() {
   return (
@@ -29,6 +33,14 @@ export function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/onboarding"
+            element={
+              <Suspense fallback={<FullPageSpinner />}>
+                <Onboarding />
+              </Suspense>
+            }
+          />
 
           {/* Protected app */}
           <Route
@@ -51,6 +63,22 @@ export function App() {
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <TestRuns />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/test-runs/:id"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <TestRunDetail />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/test-runs/compare"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <CompareRuns />
                 </Suspense>
               }
             />
@@ -91,6 +119,14 @@ export function App() {
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <Settings />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/docs"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <Docs />
                 </Suspense>
               }
             />
