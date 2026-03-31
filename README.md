@@ -55,4 +55,4 @@ supabase/
 
 ---
 
-© 2024 TestForge. Built by Umut Candan.
+© 2026 TestForge. Built by Umut Candan.
