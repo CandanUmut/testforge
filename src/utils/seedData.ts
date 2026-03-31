@@ -436,6 +436,150 @@ export function getFailureCategories() {
     .map(([name, value], i) => ({ name, value, color: colors[i] }));
 }
 
+// ─── Activity Timeline ────────────────────────────────────────────────────────
+
+export type ActivityEventType =
+  | 'test_complete'
+  | 'crash_detected'
+  | 'device_online'
+  | 'device_offline'
+  | 'report_generated'
+  | 'alert_created';
+
+export interface ActivityEvent {
+  id: string;
+  type: ActivityEventType;
+  title: string;
+  description: string;
+  timestamp: string;
+}
+
+export function getActivityTimeline(): ActivityEvent[] {
+  return [
+    {
+      id: 'act-001',
+      type: 'test_complete',
+      title: 'Smoke Test Suite finished',
+      description: 'Pixel 8 Pro #1 — 48/50 passed, 2 failed (build-412)',
+      timestamp: minutesAgo(32),
+    },
+    {
+      id: 'act-002',
+      type: 'crash_detected',
+      title: 'Kernel panic detected',
+      description: 'Pixel 8 Pro #1 — suspend-to-RAM transition (critical)',
+      timestamp: hoursAgo(2),
+    },
+    {
+      id: 'act-003',
+      type: 'device_online',
+      title: 'NRF52 BLE Module came online',
+      description: 'Connection: UART — fw-3.1.2 — RSSI healthy',
+      timestamp: minutesAgo(8),
+    },
+    {
+      id: 'act-004',
+      type: 'alert_created',
+      title: 'Regression alert triggered',
+      description: 'Power State Validation suite — pass rate dropped to 67%',
+      timestamp: hoursAgo(6),
+    },
+    {
+      id: 'act-005',
+      type: 'test_complete',
+      title: 'Full Regression completed',
+      description: 'T730 Modem Board — 112/150 passed (build-408)',
+      timestamp: hoursAgo(7),
+    },
+    {
+      id: 'act-006',
+      type: 'device_offline',
+      title: 'Smart Display Dev Kit went offline',
+      description: 'SSH connection lost — last seen 2 hours ago',
+      timestamp: hoursAgo(2),
+    },
+    {
+      id: 'act-007',
+      type: 'crash_detected',
+      title: 'OOM kill during BLE + WiFi scan',
+      description: 'IoT Sensor Hub v3 — 8 occurrences in last 3 days',
+      timestamp: hoursAgo(3),
+    },
+    {
+      id: 'act-008',
+      type: 'test_complete',
+      title: 'BLE Connectivity Test passed',
+      description: 'NRF52 BLE Module — 30/30 passed (build-411)',
+      timestamp: hoursAgo(4),
+    },
+    {
+      id: 'act-009',
+      type: 'report_generated',
+      title: 'Weekly report ready',
+      description: '47 runs · 82% pass rate · 3 new crashes this week',
+      timestamp: daysAgo(2),
+    },
+    {
+      id: 'act-010',
+      type: 'alert_created',
+      title: 'Build failure rate above threshold',
+      description: 'feature/ble-v2 — 35% failure rate over 48 hours',
+      timestamp: hoursAgo(12),
+    },
+    {
+      id: 'act-011',
+      type: 'device_online',
+      title: 'Pixel 8 Pro #2 ready',
+      description: 'ADB connected — android-14-r27 — testing mode',
+      timestamp: minutesAgo(1),
+    },
+    {
+      id: 'act-012',
+      type: 'test_complete',
+      title: 'OTA Update Validation passed',
+      description: 'IoT Sensor Hub v3 — 25/25 passed (fw-2.4.1)',
+      timestamp: hoursAgo(9),
+    },
+    {
+      id: 'act-013',
+      type: 'crash_detected',
+      title: 'ANR in SystemUI',
+      description: 'Pixel 8 Pro #2 — notification flood, 5 occurrences',
+      timestamp: daysAgo(3),
+    },
+    {
+      id: 'act-014',
+      type: 'alert_created',
+      title: 'Flaky test detected',
+      description: 'ble_connection_stability — 4/10 runs failed intermittently',
+      timestamp: daysAgo(1),
+    },
+    {
+      id: 'act-015',
+      type: 'report_generated',
+      title: 'Crash triage report exported',
+      description: '5 crashes · 1 fixed · 2 investigating · PDF generated',
+      timestamp: daysAgo(1),
+    },
+  ];
+}
+
+// ─── Sparkline Data ───────────────────────────────────────────────────────────
+
+export interface SparklinePoint {
+  value: number;
+}
+
+export function getSparklineData(metric: 'runs' | 'passRate' | 'devices' | 'crashes'): SparklinePoint[] {
+  const base: Record<typeof metric, number[]> = {
+    runs:     [5, 7, 6, 9, 8, 11, 10],
+    passRate: [78, 81, 79, 83, 85, 82, 86],
+    devices:  [3, 4, 4, 5, 4, 5, 5],
+    crashes:  [7, 6, 8, 5, 6, 4, 4],
+  };
+  return base[metric].map(value => ({ value }));
+}
+
 export function getDashboardStats() {
   const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
   const recentRuns = demoTestRuns.filter(r => new Date(r.created_at) > sevenDaysAgo);

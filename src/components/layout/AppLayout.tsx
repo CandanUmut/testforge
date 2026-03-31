@@ -1,17 +1,34 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import { Menu, Bell, X } from 'lucide-react';
+import { Outlet, useLocation } from 'react-router-dom';
+import { Menu, Bell, X, Search } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { useAuth } from '../../contexts/AuthContext';
-import { demoAlerts } from '../../utils/seedData';
+import {
+  CommandPalette,
+  CommandPaletteProvider,
+  useCommandPalette,
+} from '../common/CommandPalette';
+import {
+  NotificationCenter,
+  NotificationProvider,
+  useNotifications,
+} from '../common/NotificationCenter';
 
-export function AppLayout() {
+// ─── Inner layout (needs access to the context hooks) ────────────────────────
+
+function AppLayoutInner() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { isDemoMode } = useAuth();
-  const unread = demoAlerts.filter(a => !a.is_read).length;
+  const location = useLocation();
+  const { setOpen: openPalette } = useCommandPalette();
+  const { unreadCount, setOpen: openNotifications } = useNotifications();
 
   return (
     <div className="flex h-screen bg-[#0A0A0F] overflow-hidden">
+      {/* Always-present overlays (hidden until triggered) */}
+      <CommandPalette />
+      <NotificationCenter />
+
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex flex-shrink-0">
         <Sidebar />
@@ -20,7 +37,10 @@ export function AppLayout() {
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+          />
           <div className="relative flex flex-col w-60 flex-shrink-0 z-50">
             <Sidebar onClose={() => setMobileOpen(false)} />
           </div>
@@ -33,37 +53,80 @@ export function AppLayout() {
         {isDemoMode && (
           <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 flex items-center justify-between">
             <p className="text-amber-400 text-xs">
-              <span className="font-semibold">Demo Mode</span> — You're viewing sample data. Connect Supabase credentials for real multi-tenant auth and data persistence.
+              <span className="font-semibold">Demo Mode</span> — You&apos;re viewing sample data.
+              Connect Supabase credentials for real multi-tenant auth and data persistence.
             </p>
           </div>
         )}
 
         {/* Top bar */}
         <header className="h-14 border-b border-white/5 bg-[#0A0A0F] flex items-center justify-between px-4 flex-shrink-0">
+          {/* Mobile hamburger */}
           <button
             className="lg:hidden text-gray-400 hover:text-white"
             onClick={() => setMobileOpen(true)}
+            aria-label="Open menu"
           >
             <Menu className="w-5 h-5" />
           </button>
-          <div className="flex-1 lg:flex-none" />
+
+          {/* Spacer on mobile; ⌘K hint on desktop */}
+          <div className="flex-1 flex items-center lg:justify-end">
+            {/* ⌘K hint button — hidden on mobile */}
+            <button
+              onClick={() => openPalette(true)}
+              className="
+                hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg
+                bg-white/4 hover:bg-white/8 border border-white/8
+                text-gray-500 hover:text-gray-300
+                text-xs transition-colors
+                mr-2
+              "
+              aria-label="Open command palette"
+            >
+              <Search className="w-3.5 h-3.5" />
+              <span>Search</span>
+              <kbd className="ml-1 font-mono tracking-tight text-[10px] text-gray-600">⌘K</kbd>
+            </button>
+          </div>
+
+          {/* Right-side actions */}
           <div className="flex items-center gap-3">
-            <button className="relative text-gray-400 hover:text-white transition-colors">
+            {/* Bell / notification toggle */}
+            <button
+              onClick={() => openNotifications(true)}
+              className="relative text-gray-400 hover:text-white transition-colors"
+              aria-label="Open notifications"
+            >
               <Bell className="w-5 h-5" />
-              {unread > 0 && (
+              {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] flex items-center justify-center font-bold">
-                  {unread}
+                  {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
             </button>
           </div>
         </header>
 
-        {/* Page content */}
+        {/* Page content — keyed by pathname for transition */}
         <main className="flex-1 overflow-auto">
-          <Outlet />
+          <div key={location.pathname} className="animate-fade-in h-full">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
+  );
+}
+
+// ─── Public export — wraps with both providers ────────────────────────────────
+
+export function AppLayout() {
+  return (
+    <CommandPaletteProvider>
+      <NotificationProvider>
+        <AppLayoutInner />
+      </NotificationProvider>
+    </CommandPaletteProvider>
   );
 }
