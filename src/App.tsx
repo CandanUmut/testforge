@@ -21,8 +21,10 @@ const LogExplorer = lazy(() => import('./pages/LogExplorer').then(m => ({ defaul
 const Reports = lazy(() => import('./pages/Reports').then(m => ({ default: m.Reports })));
 const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
 const Devices = lazy(() => import('./pages/Devices').then(m => ({ default: m.Devices })));
+// Public standalone pages (no portal layout needed)
 const Docs = lazy(() => import('./pages/Docs').then(m => ({ default: m.Docs })));
 const Onboarding = lazy(() => import('./pages/Onboarding').then(m => ({ default: m.Onboarding })));
+const Setup = lazy(() => import('./pages/Setup').then(m => ({ default: m.Setup })));
 
 export function App() {
   return (
@@ -38,6 +40,22 @@ export function App() {
             element={
               <Suspense fallback={<FullPageSpinner />}>
                 <Onboarding />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/setup"
+            element={
+              <Suspense fallback={<FullPageSpinner />}>
+                <Setup />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/docs"
+            element={
+              <Suspense fallback={<FullPageSpinner />}>
+                <Docs />
               </Suspense>
             }
           />
@@ -119,14 +137,6 @@ export function App() {
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <Settings />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/docs"
-              element={
-                <Suspense fallback={<FullPageSpinner />}>
-                  <Docs />
                 </Suspense>
               }
             />

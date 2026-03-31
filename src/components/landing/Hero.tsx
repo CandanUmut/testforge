@@ -63,10 +63,10 @@ const trustLogos = [
 ];
 
 const stats = [
-  { value: '2.4M+',  label: 'test results processed' },
-  { value: '99.7%',  label: 'platform uptime' },
-  { value: '12 min', label: 'avg time to root cause' },
-  { value: '47%',    label: 'reduction in escaped defects' },
+  { value: '6 yrs',  label: 'building test infrastructure' },
+  { value: '50+',    label: 'device types supported' },
+  { value: '< 15m',  label: 'from crash to root cause' },
+  { value: '100%',   label: 'demo mode — try it now' },
 ];
 
 // ─── Rendered line component ──────────────────────────────────────────────────
@@ -251,6 +251,8 @@ function AnimatedTerminal() {
 
 export function Hero() {
   const { enterDemoMode } = useAuth();
+  // useNavigate is not needed here — enterDemoMode auto-logins in demo mode
+  // and the Link to="/dashboard" will just work
 
   return (
     <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
@@ -320,24 +322,12 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Trust bar */}
+        {/* Origin bar */}
         <div className="mt-20 pt-12 border-t border-white/5">
-          <p className="text-center text-xs text-gray-600 uppercase tracking-widest mb-8">
-            Trusted by hardware teams shipping real products
+          <p className="text-center text-sm text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            Built by engineers who spent 6 years doing test automation at Samsung Semiconductor —
+            TestForge is the system we wished existed.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
-            {trustLogos.map(logo => (
-              <div
-                key={logo.label}
-                className="flex items-center gap-2.5 opacity-30 hover:opacity-50 transition-opacity"
-              >
-                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-xs font-bold text-white">
-                  {logo.initials}
-                </div>
-                <span className="text-sm text-gray-400 hidden sm:block">{logo.label}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>

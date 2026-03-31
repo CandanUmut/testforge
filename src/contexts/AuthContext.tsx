@@ -42,6 +42,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isDemoMode) {
+      // Auto-login as demo user when no Supabase is configured
+      setUser(DEMO_USER);
+      setProfile(DEMO_PROFILE);
+      setOrganization(demoOrganization);
       setLoading(false);
       return;
     }

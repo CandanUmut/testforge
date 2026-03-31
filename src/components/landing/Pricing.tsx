@@ -1,82 +1,89 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Check, ArrowRight } from 'lucide-react';
 
 const tiers = [
   {
     name: 'Starter',
-    price: '$0',
+    price: '$199',
     period: '/month',
-    description: 'For individual engineers and small teams getting started.',
-    cta: 'Get Started Free',
-    ctaLink: '/signup',
+    description: 'For small teams running regular test automation against a handful of devices.',
+    cta: 'Start 14-Day Trial',
+    ctaAction: 'signup',
     highlight: false,
     features: [
-      'Up to 5 devices',
-      '1,000 test results/month',
-      'Basic dashboard',
+      'Up to 10 devices',
+      '5,000 test results/month',
+      'Basic dashboard & reports',
       'Email alerts',
-      '7-day log retention',
       'REST API access',
-      'Community support',
+      '30-day log retention',
+      'Standard support (email, 48hr)',
     ],
   },
   {
     name: 'Professional',
     price: '$499',
     period: '/month',
-    description: 'For product teams running continuous test automation.',
-    cta: 'Start Free Trial',
-    ctaLink: '/signup',
+    description: 'For product teams running continuous test automation across many devices.',
+    cta: 'Start 14-Day Trial',
+    ctaAction: 'signup',
     highlight: true,
     badge: 'Most popular',
     features: [
       'Up to 50 devices',
       'Unlimited test results',
-      'AI crash triage',
-      'Advanced dashboards & reports',
-      'Slack + Jira integration',
-      'Full API access',
+      'AI-powered crash triage',
+      'Advanced dashboards & custom reports',
+      'Slack + Jira + PagerDuty integration',
+      'Full API access + webhooks',
       '90-day log retention',
-      'CI/CD integration',
-      'Priority support',
+      'Priority support (chat, 4hr response)',
     ],
   },
   {
     name: 'Enterprise',
     price: 'Custom',
     period: '',
-    description: 'For hardware companies with complex testing requirements.',
+    description: 'For hardware companies with large device fleets and complex requirements.',
     cta: 'Contact Us',
-    ctaLink: '/contact',
+    ctaAction: 'contact',
     highlight: false,
     features: [
       'Unlimited devices',
-      'Dedicated test infrastructure',
-      'Custom integrations',
-      'On-premise deployment option',
+      'Dedicated infrastructure',
+      'Custom integrations & on-premise option',
       'Managed test pipeline setup',
-      'Dedicated engineer support',
-      'SLA guarantee (99.9%)',
-      'Custom retention',
-      'White-label ready',
+      'Dedicated support engineer',
+      'SLA guarantee (99.9% uptime)',
+      'Security review & compliance support',
+      'Custom log retention',
     ],
   },
 ];
 
 export function Pricing() {
+  const navigate = useNavigate();
+
+  function handleCTA(action: string) {
+    if (action === 'signup') navigate('/signup');
+    else if (action === 'contact') {
+      window.open('mailto:hello@testforge.io?subject=Enterprise inquiry', '_blank');
+    }
+  }
+
   return (
     <section id="pricing" className="py-24 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-sm font-semibold text-blue-400 uppercase tracking-widest mb-4">
-            Simple pricing
+            Pricing
           </p>
           <h2 className="section-title mb-4">
-            Pay for what you need.{' '}
-            <span className="text-gradient-green">Scale as you grow.</span>
+            Pay for what you use.{' '}
+            <span className="text-gradient-green">Cancel any time.</span>
           </h2>
           <p className="section-subtitle">
-            Start free. No credit card required. Upgrade when you're ready.
+            All plans include a 14-day free trial. No credit card required to start.
           </p>
         </div>
 
@@ -116,8 +123,8 @@ export function Pricing() {
                 ))}
               </ul>
 
-              <Link
-                to={tier.ctaLink}
+              <button
+                onClick={() => handleCTA(tier.ctaAction)}
                 className={`flex items-center justify-center gap-2 font-medium py-3 px-6 rounded-lg transition-all duration-200 ${
                   tier.highlight
                     ? 'bg-blue-500 hover:bg-blue-400 text-white'
@@ -126,13 +133,13 @@ export function Pricing() {
               >
                 {tier.cta}
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </button>
             </div>
           ))}
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-8">
-          All plans include a 14-day free trial of Professional features. No credit card required.
+          All plans include a 14-day free trial. No credit card required.
         </p>
       </div>
     </section>

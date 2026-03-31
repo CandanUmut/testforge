@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
 const stats = [
-  { value: 10000, suffix: '+', label: 'Test runs per day', color: 'text-blue-400' },
-  { value: 99.9, suffix: '%', label: 'Platform uptime', decimals: 1, color: 'text-emerald-400' },
-  { value: 6, suffix: ' yrs', label: 'Test automation experience', color: 'text-purple-400' },
-  { value: 50, suffix: '+', label: 'Device types supported', color: 'text-amber-400' },
+  { value: 6, suffix: ' yrs', label: 'Building test infrastructure', color: 'text-blue-400' },
+  { value: 50, suffix: '+', label: 'Device types supported', color: 'text-emerald-400' },
+  { value: 7, suffix: '', label: 'Test suites out of the box', color: 'text-purple-400' },
+  { value: 3, suffix: ' min', label: 'Setup to first test run', color: 'text-amber-400' },
 ];
 
 function AnimatedCounter({ value, suffix, decimals = 0, color }: { value: number; suffix: string; decimals?: number; color: string }) {
@@ -56,7 +56,7 @@ export function Stats() {
               <AnimatedCounter
                 value={stat.value}
                 suffix={stat.suffix}
-                decimals={stat.decimals}
+                decimals={(stat as { decimals?: number }).decimals}
                 color={stat.color}
               />
               <p className="text-gray-500 text-sm mt-2">{stat.label}</p>
