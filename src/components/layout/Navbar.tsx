@@ -1,18 +1,45 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Zap } from 'lucide-react';
 
-const links = [
-  { label: 'Features', href: '#features' },
-  { label: 'Architecture', href: '#architecture' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Docs', href: '#', soon: true },
+interface NavLink {
+  label: string;
+  sectionId?: string;   // scroll to this section id on landing page
+  route?: string;        // navigate to this route
+}
+
+const links: NavLink[] = [
+  { label: 'Features',     sectionId: 'features' },
+  { label: 'Architecture', sectionId: 'architecture' },
+  { label: 'Pricing',      sectionId: 'pricing' },
+  { label: 'Docs',         route: '/docs' },
 ];
+
+function scrollTo(sectionId: string) {
+  const el = document.getElementById(sectionId);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isLanding = location.pathname === '/';
+
+  function handleLink(link: NavLink) {
+    setOpen(false);
+    if (link.route) {
+      navigate(link.route);
+    } else if (link.sectionId) {
+      if (isLanding) {
+        scrollTo(link.sectionId);
+      } else {
+        // Navigate home first, then scroll
+        navigate('/');
+        setTimeout(() => scrollTo(link.sectionId!), 200);
+      }
+    }
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#0A0A0F]/80 backdrop-blur-xl">
@@ -29,16 +56,13 @@ export function Navbar() {
         {isLanding && (
           <div className="hidden md:flex items-center gap-6">
             {links.map(link => (
-              <a
+              <button
                 key={link.label}
-                href={link.href}
-                className="text-sm text-gray-400 hover:text-white transition-colors duration-200 flex items-center gap-1"
+                onClick={() => handleLink(link)}
+                className="text-sm text-gray-400 hover:text-white transition-colors duration-200"
               >
                 {link.label}
-                {link.soon && (
-                  <span className="text-[10px] text-amber-400 bg-amber-400/10 px-1 py-0.5 rounded">soon</span>
-                )}
-              </a>
+              </button>
             ))}
           </div>
         )}
@@ -66,9 +90,13 @@ export function Navbar() {
       {open && (
         <div className="md:hidden border-t border-white/5 bg-[#0A0A0F] px-4 py-4 flex flex-col gap-3">
           {isLanding && links.map(link => (
-            <a key={link.label} href={link.href} className="text-gray-400 hover:text-white text-sm py-2" onClick={() => setOpen(false)}>
+            <button
+              key={link.label}
+              onClick={() => handleLink(link)}
+              className="text-gray-400 hover:text-white text-sm py-2 text-left"
+            >
               {link.label}
-            </a>
+            </button>
           ))}
           <div className="flex flex-col gap-2 pt-2 border-t border-white/5">
             <Link to="/login" className="btn-secondary text-center text-sm" onClick={() => setOpen(false)}>Sign in</Link>
