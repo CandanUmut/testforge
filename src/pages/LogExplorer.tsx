@@ -8,12 +8,12 @@ import type { LogLevel } from '../lib/types';
 const ALL_LEVELS: LogLevel[] = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'];
 
 const levelBg: Record<LogLevel, string> = {
-  trace: 'bg-gray-500/10 border-gray-500/20',
-  debug: 'bg-gray-400/10 border-gray-400/20',
-  info: 'bg-blue-500/10 border-blue-500/20',
-  warn: 'bg-amber-500/10 border-amber-500/20',
-  error: 'bg-red-500/10 border-red-500/20',
-  fatal: 'bg-red-600/15 border-red-600/30',
+  trace: 'bg-gray-100 border-gray-200',
+  debug: 'bg-gray-100 border-gray-200',
+  info: 'bg-blue-50 border-blue-200',
+  warn: 'bg-amber-50 border-amber-200',
+  error: 'bg-red-50 border-red-200',
+  fatal: 'bg-red-100 border-red-300',
 };
 
 export function LogExplorer() {
@@ -42,16 +42,16 @@ export function LogExplorer() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-white/5 flex-shrink-0 space-y-4">
+      <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0 space-y-4 bg-white">
         <div>
-          <h1 className="text-xl font-bold text-white">Log Explorer</h1>
-          <p className="text-sm text-gray-400 mt-0.5">{filtered.length} log entries</p>
+          <h1 className="text-xl font-bold text-gray-900">Log Explorer</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{filtered.length} log entries</p>
         </div>
 
         {/* Search */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               value={search}
@@ -74,7 +74,7 @@ export function LogExplorer() {
 
         {/* Level filters */}
         <div className="flex flex-wrap gap-2 items-center">
-          <Filter className="w-3.5 h-3.5 text-gray-500" />
+          <Filter className="w-3.5 h-3.5 text-gray-400" />
           {ALL_LEVELS.map(level => (
             <button
               key={level}
@@ -82,7 +82,7 @@ export function LogExplorer() {
               className={`px-2.5 py-0.5 rounded-full text-xs font-medium border transition-all font-mono ${
                 levelFilters.has(level)
                   ? `${levelBg[level]} ${LOG_LEVEL_COLORS[level]}`
-                  : 'bg-white/3 border-white/8 text-gray-600'
+                  : 'bg-gray-50 border-gray-200 text-gray-400'
               }`}
             >
               {level}
@@ -92,19 +92,19 @@ export function LogExplorer() {
       </div>
 
       {/* Log output */}
-      <div className="flex-1 overflow-y-auto bg-[#060609] font-mono">
+      <div className="flex-1 overflow-y-auto bg-gray-50 font-mono">
         {filtered.length === 0 ? (
-          <div className="flex items-center justify-center py-20 text-gray-600 text-sm">
+          <div className="flex items-center justify-center py-20 text-gray-400 text-sm">
             No logs match current filters
           </div>
         ) : (
-          <div className="divide-y divide-white/[0.03]">
+          <div className="divide-y divide-gray-100">
             {filtered.map(log => {
               const device = demoDevices.find(d => d.id === log.device_id);
               return (
-                <div key={log.id} className="flex gap-3 px-4 py-2 hover:bg-white/[0.02] transition-colors group text-xs">
+                <div key={log.id} className="flex gap-3 px-4 py-2 bg-white hover:bg-gray-50 transition-colors group text-xs border-b border-gray-50">
                   {/* Timestamp */}
-                  <span className="text-gray-700 flex-shrink-0 w-28 truncate">
+                  <span className="text-gray-400 flex-shrink-0 w-28 truncate">
                     {new Date(log.timestamp).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </span>
 
@@ -115,12 +115,12 @@ export function LogExplorer() {
 
                   {/* Source */}
                   {log.source && (
-                    <span className="text-blue-400/60 flex-shrink-0 w-24 truncate">[{log.source}]</span>
+                    <span className="text-indigo-500 flex-shrink-0 w-24 truncate">[{log.source}]</span>
                   )}
 
                   {/* Device */}
                   {device && (
-                    <span className="text-purple-400/40 flex-shrink-0 w-24 truncate hidden md:block">{device.serial_number}</span>
+                    <span className="text-gray-400 flex-shrink-0 w-24 truncate hidden md:block">{device.serial_number}</span>
                   )}
 
                   {/* Message */}

@@ -8,10 +8,10 @@ interface TriageActionsProps {
 }
 
 const statusActions: { status: CrashStatus; label: string; icon: typeof CheckCircle; color: string }[] = [
-  { status: 'investigating', label: 'Mark Investigating', icon: AlertTriangle, color: 'text-amber-400 bg-amber-400/10 border-amber-400/20 hover:bg-amber-400/20' },
-  { status: 'identified', label: 'Mark Identified', icon: CheckCircle, color: 'text-blue-400 bg-blue-400/10 border-blue-400/20 hover:bg-blue-400/20' },
-  { status: 'fixed', label: 'Mark Fixed', icon: CheckCircle, color: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20 hover:bg-emerald-400/20' },
-  { status: 'wont_fix', label: "Won't Fix", icon: XCircle, color: 'text-gray-400 bg-gray-400/10 border-gray-400/20 hover:bg-gray-400/20' },
+  { status: 'investigating', label: 'Mark Investigating', icon: AlertTriangle, color: 'text-amber-600 bg-amber-50 border-amber-200 hover:bg-amber-100' },
+  { status: 'identified', label: 'Mark Identified', icon: CheckCircle, color: 'text-blue-600 bg-blue-50 border-blue-200 hover:bg-blue-100' },
+  { status: 'fixed', label: 'Mark Fixed', icon: CheckCircle, color: 'text-emerald-600 bg-emerald-50 border-emerald-200 hover:bg-emerald-100' },
+  { status: 'wont_fix', label: "Won't Fix", icon: XCircle, color: 'text-gray-600 bg-gray-50 border-gray-200 hover:bg-gray-100' },
 ];
 
 export function TriageActions({ crash, onStatusChange }: TriageActionsProps) {
@@ -26,8 +26,8 @@ export function TriageActions({ crash, onStatusChange }: TriageActionsProps) {
   }
 
   return (
-    <div className="glass-card p-5">
-      <h3 className="text-sm font-semibold text-white mb-4">Triage Actions</h3>
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <h3 className="text-sm font-semibold text-gray-900 mb-4">Triage Actions</h3>
 
       {/* Status change */}
       <div className="space-y-2 mb-5">
@@ -49,22 +49,22 @@ export function TriageActions({ crash, onStatusChange }: TriageActionsProps) {
       </div>
 
       {/* Other actions */}
-      <div className="border-t border-white/5 pt-4 space-y-2">
-        <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+      <div className="border-t border-gray-100 pt-4 space-y-2">
+        <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">
           <UserCheck className="w-3.5 h-3.5" />
           Assign to me
         </button>
         <button
           onClick={copyFingerprint}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all"
         >
           <Copy className="w-3.5 h-3.5" />
           {copied ? 'Copied!' : 'Copy fingerprint'}
         </button>
-        <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+        <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">
           <ExternalLink className="w-3.5 h-3.5" />
           Create Jira ticket
-          <span className="ml-auto text-[10px] text-amber-400 bg-amber-400/10 px-1 py-0.5 rounded">soon</span>
+          <span className="ml-auto text-[10px] text-amber-600 bg-amber-50 px-1 py-0.5 rounded border border-amber-200">soon</span>
         </button>
       </div>
     </div>

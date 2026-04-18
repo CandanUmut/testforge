@@ -1,6 +1,11 @@
-import { useAuth } from '../contexts/AuthContext';
+import { useDataContext } from '../contexts/DataContext';
 
 export function useOrganization() {
-  const { organization, profile, loading } = useAuth();
-  return { organization, profile, loading };
+  const { organization, profile, dataLoading } = useDataContext();
+
+  return {
+    organization,
+    profile,
+    loading: dataLoading,
+  };
 }

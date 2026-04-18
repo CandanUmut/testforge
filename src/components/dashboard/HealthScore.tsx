@@ -14,7 +14,7 @@ interface SubScoreRowProps {
 
 function SubScoreRow({ label, score, weight }: SubScoreRowProps) {
   const color =
-    score >= 80 ? 'text-emerald-400' : score >= 60 ? 'text-amber-400' : 'text-red-400';
+    score >= 80 ? 'text-emerald-600' : score >= 60 ? 'text-amber-600' : 'text-red-500';
   return (
     <div className="flex items-center justify-between gap-3">
       <span className="text-xs text-gray-400 truncate">{label}</span>
@@ -34,11 +34,11 @@ interface GradeBadgeProps {
 
 function GradeBadge({ grade, label, color }: GradeBadgeProps) {
   const bg =
-    color === 'text-emerald-400'
-      ? 'bg-emerald-400/10 border-emerald-400/30 text-emerald-400'
-      : color === 'text-amber-400'
-      ? 'bg-amber-400/10 border-amber-400/30 text-amber-400'
-      : 'bg-red-400/10 border-red-400/30 text-red-400';
+    color === 'text-emerald-600'
+      ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
+      : color === 'text-amber-600'
+      ? 'bg-amber-50 border-amber-200 text-amber-600'
+      : 'bg-red-50 border-red-200 text-red-500';
 
   return (
     <div className="flex flex-col items-center gap-1">
@@ -81,8 +81,8 @@ export function HealthScore({ breakdown }: HealthScoreProps) {
   ];
 
   return (
-    <div className="glass-card p-6 flex flex-col items-center gap-4 relative">
-      <h3 className="text-sm font-semibold text-white self-start">Test Health Score</h3>
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col items-center gap-4 relative">
+      <h3 className="text-sm font-semibold text-gray-900 self-start">Test Health Score</h3>
 
       {/* Gauge */}
       <div
@@ -99,7 +99,7 @@ export function HealthScore({ breakdown }: HealthScoreProps) {
             cy="60"
             r={RADIUS}
             fill="none"
-            stroke="rgba(255,255,255,0.06)"
+            stroke="#e5e7eb"
             strokeWidth="8"
           />
           {/* Filled arc — animates via stroke-dashoffset CSS transition */}
@@ -123,7 +123,7 @@ export function HealthScore({ breakdown }: HealthScoreProps) {
             textAnchor="middle"
             dominantBaseline="middle"
             className="font-bold"
-            style={{ fill: '#ffffff', fontSize: '22px', fontWeight: 700, fontFamily: 'inherit' }}
+            style={{ fill: '#111827', fontSize: '22px', fontWeight: 700, fontFamily: 'inherit' }}
           >
             {data.total}
           </text>
@@ -142,18 +142,18 @@ export function HealthScore({ breakdown }: HealthScoreProps) {
         {/* Hover tooltip: sub-score breakdown */}
         {hovered && (
           <div
-            className="absolute z-20 bottom-full mb-3 left-1/2 -translate-x-1/2 glass-card p-3 min-w-[200px] shadow-xl border border-white/10"
+            className="absolute z-20 bottom-full mb-3 left-1/2 -translate-x-1/2 bg-white rounded-xl border border-gray-200 shadow-xl p-3 min-w-[200px]"
             role="tooltip"
           >
-            <p className="text-xs font-semibold text-white mb-2">Score Breakdown</p>
+            <p className="text-xs font-semibold text-gray-900 mb-2">Score Breakdown</p>
             <div className="space-y-1.5">
               {subScores.map(s => (
                 <SubScoreRow key={s.label} {...s} />
               ))}
             </div>
-            <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between">
+            <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between">
               <span className="text-xs text-gray-500">Total</span>
-              <span className="text-xs font-bold text-white">{data.total}</span>
+              <span className="text-xs font-bold text-gray-900">{data.total}</span>
             </div>
           </div>
         )}
@@ -174,7 +174,7 @@ export function HealthScore({ breakdown }: HealthScoreProps) {
           return (
             <div key={s.label} className="flex items-center gap-2">
               <span className="text-xs text-gray-500 w-24 truncate shrink-0">{s.label}</span>
-              <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
                   className={`h-full ${barColor} rounded-full`}
                   style={{

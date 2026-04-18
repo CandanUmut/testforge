@@ -11,41 +11,42 @@ export const COLORS = {
   green: '#10B981',
   amber: '#F59E0B',
   red: '#EF4444',
-  purple: '#8B5CF6',
+  indigo: '#4f46e5',
   pink: '#EC4899',
   gray: '#6B7280',
-  dark: '#0A0A0F',
-  card: '#0F0F1A',
-  border: 'rgba(255,255,255,0.08)',
+  dark: '#0f172a',
+  card: '#ffffff',
+  border: '#e5e7eb',
 } as const;
 
 export const STATUS_COLORS = {
-  passed: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-  failed: 'text-red-400 bg-red-400/10 border-red-400/20',
-  error: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-  running: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-  pending: 'text-gray-400 bg-gray-400/10 border-gray-400/20',
-  cancelled: 'text-gray-400 bg-gray-400/10 border-gray-400/20',
-  timeout: 'text-orange-400 bg-orange-400/10 border-orange-400/20',
-  skipped: 'text-gray-500 bg-gray-500/10 border-gray-500/20',
-  flaky: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
+  passed: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+  failed: 'text-red-600 bg-red-50 border-red-200',
+  error: 'text-amber-600 bg-amber-50 border-amber-200',
+  running: 'text-blue-600 bg-blue-50 border-blue-200',
+  pending: 'text-gray-600 bg-gray-100 border-gray-200',
+  cancelled: 'text-gray-600 bg-gray-100 border-gray-200',
+  timeout: 'text-orange-600 bg-orange-50 border-orange-200',
+  skipped: 'text-gray-500 bg-gray-100 border-gray-200',
+  flaky: 'text-indigo-600 bg-indigo-50 border-indigo-200',
 } as const;
 
 export const SEVERITY_COLORS = {
-  critical: 'text-red-400 bg-red-400/10 border-red-400/20',
-  high: 'text-orange-400 bg-orange-400/10 border-orange-400/20',
-  medium: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-  low: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-  info: 'text-gray-400 bg-gray-400/10 border-gray-400/20',
-  warning: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
+  critical: 'text-red-600 bg-red-50 border-red-200',
+  high: 'text-orange-600 bg-orange-50 border-orange-200',
+  medium: 'text-amber-600 bg-amber-50 border-amber-200',
+  low: 'text-blue-600 bg-blue-50 border-blue-200',
+  info: 'text-gray-600 bg-gray-100 border-gray-200',
+  warning: 'text-amber-600 bg-amber-50 border-amber-200',
 } as const;
 
 export const DEVICE_STATUS_COLORS = {
-  online: 'text-emerald-400',
-  offline: 'text-gray-500',
-  testing: 'text-blue-400',
+  online: 'text-emerald-500',
+  offline: 'text-gray-400',
+  testing: 'text-blue-500',
   error: 'text-red-400',
   maintenance: 'text-amber-400',
+  flashing: 'text-blue-500',
 } as const;
 
 export const CRASH_TYPE_LABELS: Record<string, string> = {
@@ -63,22 +64,22 @@ export const CRASH_TYPE_LABELS: Record<string, string> = {
 };
 
 export const LOG_LEVEL_COLORS: Record<string, string> = {
-  trace: 'text-gray-600',
-  debug: 'text-gray-400',
-  info: 'text-blue-400',
-  warn: 'text-amber-400',
-  error: 'text-red-400',
-  fatal: 'text-red-600',
+  trace: 'text-gray-400',
+  debug: 'text-gray-500',
+  info: 'text-blue-600',
+  warn: 'text-amber-600',
+  error: 'text-red-500',
+  fatal: 'text-red-700',
 };
 
 export const FAILURE_CATEGORY_COLORS = [
-  '#EF4444',
-  '#F59E0B',
-  '#8B5CF6',
-  '#EC4899',
-  '#3B82F6',
-  '#10B981',
-  '#6B7280',
+  '#ef4444',
+  '#f59e0b',
+  '#6366f1',
+  '#ec4899',
+  '#3b82f6',
+  '#10b981',
+  '#6b7280',
 ];
 
 export const NAV_ITEMS = [

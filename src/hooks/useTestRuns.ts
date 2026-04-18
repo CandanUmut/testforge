@@ -1,54 +1,49 @@
-import { useState, useEffect } from 'react';
-import { supabase, isDemoMode } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
+import { useMemo } from 'react';
+import { useDataContext } from '../contexts/DataContext';
 import type { TestRun } from '../lib/types';
-import { demoTestRuns } from '../utils/seedData';
 
 interface UseTestRunsOptions {
   limit?: number;
   status?: string;
+  suite?: string;
+  device?: string;
+  branch?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export function useTestRuns(options: UseTestRunsOptions = {}) {
-  const { organization } = useAuth();
-  const [runs, setRuns] = useState<TestRun[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { testRuns, dataLoading } = useDataContext();
 
-  useEffect(() => {
-    if (isDemoMode || !organization) {
-      let filtered = [...demoTestRuns];
-      if (options.status) {
-        filtered = filtered.filter(r => r.status === options.status);
-      }
-      if (options.limit) {
-        filtered = filtered.slice(0, options.limit);
-      }
-      setRuns(filtered);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    let query = supabase
-      .from('test_runs')
-      .select('*, device:devices(*)')
-      .eq('organization_id', organization.id)
-      .order('created_at', { ascending: false });
+  const filtered = useMemo(() => {
+    let result = [...testRuns];
 
     if (options.status) {
-      query = query.eq('status', options.status);
+      result = result.filter(r => r.status === options.status);
+    }
+    if (options.suite) {
+      result = result.filter(r => r.suite_name === options.suite);
+    }
+    if (options.device) {
+      result = result.filter(r => r.device_id === options.device);
+    }
+    if (options.branch) {
+      result = result.filter(r => r.branch === options.branch);
+    }
+    if (options.dateFrom) {
+      const from = new Date(options.dateFrom).getTime();
+      result = result.filter(r => new Date(r.created_at).getTime() >= from);
+    }
+    if (options.dateTo) {
+      const to = new Date(options.dateTo).getTime();
+      result = result.filter(r => new Date(r.created_at).getTime() <= to);
     }
     if (options.limit) {
-      query = query.limit(options.limit);
+      result = result.slice(0, options.limit);
     }
 
-    query.then(({ data, error: err }) => {
-      if (err) setError(err.message);
-      else setRuns(data || []);
-      setLoading(false);
-    });
-  }, [organization?.id, options.limit, options.status]);
+    return result;
+  }, [testRuns, options.limit, options.status, options.suite, options.device, options.branch, options.dateFrom, options.dateTo]);
 
-  return { runs, loading, error };
+  return { runs: filtered, loading: dataLoading, error: null as string | null };
 }

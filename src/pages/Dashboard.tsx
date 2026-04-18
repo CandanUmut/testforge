@@ -8,10 +8,10 @@ import { HealthScore } from '../components/dashboard/HealthScore';
 import { ActivityTimeline } from '../components/dashboard/ActivityTimeline';
 import { useDashboardStats } from '../hooks/useDashboardStats';
 import { useTestRuns } from '../hooks/useTestRuns';
-import { useAuth } from '../contexts/AuthContext';
+import { useOrganization } from '../hooks/useOrganization';
 
 export function Dashboard() {
-  const { organization } = useAuth();
+  const { organization } = useOrganization();
   const { stats, passFailTrend, failureCategories, loading: statsLoading } = useDashboardStats();
   const { runs, loading: runsLoading } = useTestRuns({ limit: 10 });
 
@@ -19,8 +19,8 @@ export function Dashboard() {
     <div className="p-6 space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-xl font-bold text-white">Dashboard</h1>
-        <p className="text-sm text-gray-400 mt-1">
+        <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-sm text-gray-500 mt-1">
           {organization?.name || 'TestForge'} — Overview
         </p>
       </div>

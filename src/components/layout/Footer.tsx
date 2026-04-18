@@ -1,82 +1,72 @@
-import { Zap, Github } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Github, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { GITHUB_URL, AUTHOR_GITHUB } from '../../utils/constants';
+import { PUBLIC_ROUTES, getAppPath } from '../../lib/routes';
 
-function scrollTo(id: string) {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+interface FooterProps {
+  onSelectSection: (id: string) => void;
 }
 
-export function Footer() {
-  const navigate = useNavigate();
-
-  function scrollOrNavigate(id: string) {
-    if (window.location.hash === '#/') {
-      scrollTo(id);
-    } else {
-      navigate('/');
-      setTimeout(() => scrollTo(id), 200);
-    }
-  }
-
+export function Footer({ onSelectSection }: FooterProps) {
   return (
-    <footer className="border-t border-white/5 bg-[#0A0A0F]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 font-bold text-lg mb-4">
-              <div className="w-7 h-7 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
-                <Zap className="w-3.5 h-3.5 text-blue-400" />
+    <footer className="border-t border-gray-200 bg-gray-50">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid gap-12 md:grid-cols-[1.6fr_repeat(3,minmax(0,1fr))]">
+          <div>
+            <div className="flex items-center gap-3 text-lg font-semibold tracking-[-0.03em] text-slate-950">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <Zap className="h-4 w-4 text-indigo-600" />
               </div>
-              <span className="text-white">Test<span className="text-blue-400">Forge</span></span>
+              <span>Test<span className="text-indigo-600">Forge</span></span>
             </div>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              Test infrastructure that runs itself. Built for hardware teams who ship real products.
+            <p className="mt-4 max-w-sm text-sm leading-7 text-slate-600">
+              Device health, test orchestration, crash triage, and lab operations in one platform for
+              hardware, firmware, and software teams.
             </p>
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-300 mb-4">Product</p>
-            <ul className="space-y-3">
-              <li><button onClick={() => scrollOrNavigate('features')} className="text-gray-500 hover:text-gray-300 text-sm transition-colors text-left">Features</button></li>
-              <li><button onClick={() => scrollOrNavigate('pricing')} className="text-gray-500 hover:text-gray-300 text-sm transition-colors text-left">Pricing</button></li>
-              <li><button onClick={() => scrollOrNavigate('architecture')} className="text-gray-500 hover:text-gray-300 text-sm transition-colors text-left">Architecture</button></li>
-            </ul>
+            <p className="text-sm font-semibold text-slate-950">Product</p>
+            <div className="mt-4 space-y-3 text-sm text-slate-600">
+              <button type="button" onClick={() => onSelectSection('features')} className="block transition hover:text-slate-950">Features</button>
+              <button type="button" onClick={() => onSelectSection('architecture')} className="block transition hover:text-slate-950">Architecture</button>
+              <button type="button" onClick={() => onSelectSection('pricing')} className="block transition hover:text-slate-950">Pricing</button>
+              <Link to={getAppPath('demo')} className="block transition hover:text-slate-950">Demo</Link>
+            </div>
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-300 mb-4">Resources</p>
-            <ul className="space-y-3">
-              <li><Link to="/docs" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">API Reference</Link></li>
-              <li><Link to="/setup" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">Setup Guide</Link></li>
-              <li><a href={GITHUB_URL} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">GitHub</a></li>
-            </ul>
+            <p className="text-sm font-semibold text-slate-950">Resources</p>
+            <div className="mt-4 space-y-3 text-sm text-slate-600">
+              <Link to={PUBLIC_ROUTES.setupGuide} className="block transition hover:text-slate-950">Setup Guide</Link>
+              <Link to={PUBLIC_ROUTES.apiDocs} className="block transition hover:text-slate-950">API Docs</Link>
+              <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="block transition hover:text-slate-950">GitHub</a>
+            </div>
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-300 mb-4">Account</p>
-            <ul className="space-y-3">
-              <li><Link to="/login" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">Sign in</Link></li>
-              <li><Link to="/signup" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">Start free trial</Link></li>
-              <li><a href="mailto:hello@testforge.io" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">Contact us</a></li>
-            </ul>
+            <p className="text-sm font-semibold text-slate-950">Company</p>
+            <div className="mt-4 space-y-3 text-sm text-slate-600">
+              <Link to={PUBLIC_ROUTES.login} className="block transition hover:text-slate-950">Sign in</Link>
+              <Link to={PUBLIC_ROUTES.signup} className="block transition hover:text-slate-950">Start Free Trial</Link>
+              <a href="#" className="block transition hover:text-slate-950">Privacy Policy</a>
+              <a href="#" className="block transition hover:text-slate-950">Terms of Service</a>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-white/5">
-          <p className="text-gray-600 text-sm">
-            © 2026 TestForge. All rights reserved.{' '}
-            Built by{' '}
-            <a href={AUTHOR_GITHUB} className="text-gray-400 hover:text-white transition-colors" target="_blank" rel="noreferrer">
+        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-slate-200 pt-8 text-sm text-slate-500 md:flex-row md:items-center">
+          <p>
+            © 2026 TestForge. Built by{' '}
+            <a href={AUTHOR_GITHUB} className="text-slate-700 transition hover:text-slate-950" target="_blank" rel="noreferrer">
               Umut Candan
             </a>
-            .
           </p>
           <div className="flex items-center gap-4">
-            <Link to="/login" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">Sign in</Link>
-            <Link to="/signup" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">Sign up</Link>
-            <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-white transition-colors">
-              <Github className="w-5 h-5" />
+            <Link to={PUBLIC_ROUTES.setupGuide} className="transition hover:text-slate-950">Setup Guide</Link>
+            <Link to={PUBLIC_ROUTES.apiDocs} className="transition hover:text-slate-950">API Docs</Link>
+            <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="text-slate-500 transition hover:text-slate-950">
+              <Github className="h-5 w-5" />
             </a>
           </div>
         </div>

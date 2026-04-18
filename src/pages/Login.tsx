@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Zap, Mail, Lock, Play } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { isDemoMode as hasMissingBackendConfig } from '../lib/supabase';
+import { getAppPath, PUBLIC_ROUTES } from '../lib/routes';
 
 export function Login() {
   const navigate = useNavigate();
-  const { signIn, signInWithGoogle, enterDemoMode, isDemoMode } = useAuth();
+  const { signIn, signInWithGoogle, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,7 +22,7 @@ export function Login() {
       setError(err.message);
       setLoading(false);
     } else {
-      navigate('/dashboard');
+      navigate('/app/dashboard');
     }
   }
 
@@ -33,59 +35,52 @@ export function Login() {
     }
   }
 
-  function handleDemo() {
-    enterDemoMode();
-    navigate('/dashboard');
-  }
-
   return (
-    <div className="min-h-screen bg-[#0A0A0F] bg-grid-pattern flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 font-bold text-xl mb-6">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
-              <Zap className="w-5 h-5 text-blue-400" />
+          <Link to={PUBLIC_ROUTES.landing} className="inline-flex items-center gap-2 font-bold text-xl mb-6">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center">
+              <Zap className="w-5 h-5 text-indigo-600" />
             </div>
-            <span className="text-white">Test<span className="text-blue-400">Forge</span></span>
+            <span className="text-gray-900">Test<span className="text-indigo-600">Forge</span></span>
           </Link>
-          <h1 className="text-2xl font-bold text-white">Welcome back</h1>
-          <p className="text-gray-400 mt-2 text-sm">Sign in to your TestForge account</p>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
+          <p className="text-gray-500 mt-2 text-sm">Sign in to your TestForge account</p>
         </div>
 
-        <div className="glass-card p-8">
-          {isDemoMode && (
-            <div className="mb-6 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-400 text-xs">
-              Demo mode active — no real backend configured. Any credentials will work.
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-card p-8">
+          {hasMissingBackendConfig && (
+            <div className="mb-6 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-xs">
+              Backend not configured. Use the demo dashboard while Supabase is being set up.
             </div>
           )}
 
-          {/* Demo CTA */}
           <button
-            onClick={handleDemo}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg border border-blue-500/20 bg-blue-500/5 text-blue-400 hover:bg-blue-500/10 transition-all mb-6 font-medium text-sm"
+            onClick={() => navigate(getAppPath('demo'))}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all mb-6 font-medium text-sm"
           >
             <Play className="w-4 h-4" />
             Explore Demo Dashboard (no sign-in required)
           </button>
 
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-white/8" />
-            <span className="text-gray-600 text-xs">or sign in with email</span>
-            <div className="flex-1 h-px bg-white/8" />
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-gray-400 text-xs">or sign in with email</span>
+            <div className="flex-1 h-px bg-gray-200" />
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="label">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="email"
                   value={email}
@@ -99,16 +94,16 @@ export function Login() {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="label mb-0">Password</label>
-                <a href="#" className="text-xs text-blue-400 hover:text-blue-300">Forgot password?</a>
+                <label className="block text-sm font-medium text-gray-700">Password</label>
+                <a href="#" className="text-xs text-indigo-600 hover:text-indigo-700">Forgot password?</a>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   className="input-field pl-10"
                   required
                 />
@@ -121,15 +116,15 @@ export function Login() {
           </form>
 
           <div className="flex items-center gap-3 my-4">
-            <div className="flex-1 h-px bg-white/8" />
-            <span className="text-gray-600 text-xs">or</span>
-            <div className="flex-1 h-px bg-white/8" />
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-gray-400 text-xs">or</span>
+            <div className="flex-1 h-px bg-gray-200" />
           </div>
 
           <button
             onClick={handleGoogle}
             disabled={loading}
-            className="btn-secondary w-full py-3 flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium text-sm hover:bg-gray-50 transition-all"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -143,7 +138,7 @@ export function Login() {
 
         <p className="text-center text-gray-500 text-sm mt-6">
           Don't have an account?{' '}
-          <Link to="/signup" className="text-blue-400 hover:text-blue-300">Start for free</Link>
+          <Link to={PUBLIC_ROUTES.signup} className="text-indigo-600 hover:text-indigo-700 font-medium">Start for free</Link>
         </p>
       </div>
     </div>

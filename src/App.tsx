@@ -1,9 +1,11 @@
 import { lazy, Suspense } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { DataProvider } from './contexts/DataContext';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 import { FullPageSpinner } from './components/common/LoadingSpinner';
+import { PUBLIC_ROUTES, getAppPath } from './lib/routes';
 
 // Eager load auth + landing (needed immediately)
 import { Landing } from './pages/Landing';
@@ -21,10 +23,11 @@ const LogExplorer = lazy(() => import('./pages/LogExplorer').then(m => ({ defaul
 const Reports = lazy(() => import('./pages/Reports').then(m => ({ default: m.Reports })));
 const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
 const Devices = lazy(() => import('./pages/Devices').then(m => ({ default: m.Devices })));
-// Public standalone pages (no portal layout needed)
-const Docs = lazy(() => import('./pages/Docs').then(m => ({ default: m.Docs })));
+const SetupGuide = lazy(() => import('./pages/SetupGuide').then(m => ({ default: m.SetupGuide })));
+const ApiDocs = lazy(() => import('./pages/ApiDocs').then(m => ({ default: m.ApiDocs })));
 const Onboarding = lazy(() => import('./pages/Onboarding').then(m => ({ default: m.Onboarding })));
 const Setup = lazy(() => import('./pages/Setup').then(m => ({ default: m.Setup })));
+const Docs = lazy(() => import('./pages/Docs').then(m => ({ default: m.Docs })));
 
 export function App() {
   return (
@@ -32,9 +35,25 @@ export function App() {
       <AuthProvider>
         <Routes>
           {/* Public */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path={PUBLIC_ROUTES.landing} element={<Landing />} />
+          <Route path={PUBLIC_ROUTES.login} element={<Login />} />
+          <Route path={PUBLIC_ROUTES.signup} element={<Signup />} />
+          <Route
+            path={PUBLIC_ROUTES.setupGuide}
+            element={
+              <Suspense fallback={<FullPageSpinner />}>
+                <SetupGuide />
+              </Suspense>
+            }
+          />
+          <Route
+            path={PUBLIC_ROUTES.apiDocs}
+            element={
+              <Suspense fallback={<FullPageSpinner />}>
+                <ApiDocs />
+              </Suspense>
+            }
+          />
           <Route
             path="/onboarding"
             element={
@@ -60,16 +79,17 @@ export function App() {
             }
           />
 
-          {/* Protected app */}
+          {/* Demo app */}
           <Route
+            path="/demo"
             element={
-              <ProtectedRoute>
+              <DataProvider mode="demo">
                 <AppLayout />
-              </ProtectedRoute>
+              </DataProvider>
             }
           >
             <Route
-              path="/dashboard"
+              index
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <Dashboard />
@@ -77,7 +97,15 @@ export function App() {
               }
             />
             <Route
-              path="/test-runs"
+              path="dashboard"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <Dashboard />
+                </Suspense>
+              }
+            />
+            <Route
+              path="test-runs"
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <TestRuns />
@@ -85,7 +113,7 @@ export function App() {
               }
             />
             <Route
-              path="/test-runs/:id"
+              path="test-runs/:id"
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <TestRunDetail />
@@ -93,7 +121,7 @@ export function App() {
               }
             />
             <Route
-              path="/test-runs/compare"
+              path="test-runs/compare"
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <CompareRuns />
@@ -101,7 +129,7 @@ export function App() {
               }
             />
             <Route
-              path="/crash-triage"
+              path="crash-triage"
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <CrashTriage />
@@ -109,7 +137,7 @@ export function App() {
               }
             />
             <Route
-              path="/logs"
+              path="logs"
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <LogExplorer />
@@ -117,7 +145,7 @@ export function App() {
               }
             />
             <Route
-              path="/devices"
+              path="devices"
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <Devices />
@@ -125,7 +153,7 @@ export function App() {
               }
             />
             <Route
-              path="/reports"
+              path="reports"
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <Reports />
@@ -133,14 +161,98 @@ export function App() {
               }
             />
             <Route
-              path="/settings"
+              path="settings"
               element={
                 <Suspense fallback={<FullPageSpinner />}>
                   <Settings />
                 </Suspense>
               }
             />
-            <Route path="/app" element={<Navigate to="/dashboard" replace />} />
+          </Route>
+
+          {/* Protected app */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <DataProvider mode="app">
+                  <AppLayout />
+                </DataProvider>
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/app" element={<Navigate to={getAppPath('app')} replace />} />
+            <Route
+              path="/app/dashboard"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <Dashboard />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/app/test-runs"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <TestRuns />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/app/test-runs/:id"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <TestRunDetail />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/app/test-runs/compare"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <CompareRuns />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/app/crash-triage"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <CrashTriage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/app/logs"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <LogExplorer />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/app/devices"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <Devices />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/app/reports"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <Reports />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/app/settings"
+              element={
+                <Suspense fallback={<FullPageSpinner />}>
+                  <Settings />
+                </Suspense>
+              }
+            />
           </Route>
 
           <Route path="*" element={<NotFound />} />

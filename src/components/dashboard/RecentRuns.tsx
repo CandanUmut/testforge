@@ -1,9 +1,10 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Cpu } from 'lucide-react';
 import type { TestRun } from '../../lib/types';
 import { StatusBadge } from '../common/Badge';
 import { formatRelativeTime, formatDuration, formatPassRate } from '../../utils/formatters';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { useDataContext } from '../../contexts/DataContext';
 
 interface RecentRunsProps {
   runs: TestRun[];
@@ -11,14 +12,17 @@ interface RecentRunsProps {
 }
 
 export function RecentRuns({ runs, loading }: RecentRunsProps) {
+  const { getScopedPath, basePath } = useDataContext();
+  const navigate = useNavigate();
+
   return (
-    <div className="glass-card overflow-hidden">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
         <div>
-          <h3 className="text-sm font-semibold text-white">Recent Test Runs</h3>
+          <h3 className="text-sm font-semibold text-gray-900">Recent Test Runs</h3>
           <p className="text-xs text-gray-500 mt-0.5">Latest 10 runs</p>
         </div>
-        <Link to="/test-runs" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
+        <Link to={getScopedPath('test-runs')} className="text-xs text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors">
           View all <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
@@ -36,7 +40,7 @@ export function RecentRuns({ runs, loading }: RecentRunsProps) {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5">
+              <tr className="border-b border-gray-100">
                 <th className="table-header">Test Suite</th>
                 <th className="table-header hidden md:table-cell">Device</th>
                 <th className="table-header hidden sm:table-cell">Pass Rate</th>
@@ -47,10 +51,10 @@ export function RecentRuns({ runs, loading }: RecentRunsProps) {
             </thead>
             <tbody>
               {runs.slice(0, 10).map(run => (
-                <tr key={run.id} className="table-row cursor-pointer" onClick={() => {}}>
+                <tr key={run.id} className="table-row cursor-pointer" onClick={() => navigate(`${basePath}/test-runs/${run.id}`)}>
                   <td className="table-cell">
                     <div>
-                      <p className="text-sm text-white font-medium truncate max-w-[140px]">{run.name}</p>
+                      <p className="text-sm text-gray-900 font-medium truncate max-w-[140px]">{run.name}</p>
                       <p className="text-xs text-gray-600 mt-0.5">{run.branch || 'main'}</p>
                     </div>
                   </td>
@@ -62,7 +66,7 @@ export function RecentRuns({ runs, loading }: RecentRunsProps) {
                   </td>
                   <td className="table-cell hidden sm:table-cell">
                     <div>
-                      <p className="text-sm text-white">{formatPassRate(run.passed, run.total_tests)}</p>
+                      <p className="text-sm text-gray-900">{formatPassRate(run.passed, run.total_tests)}</p>
                       <p className="text-xs text-gray-600">{run.passed}/{run.total_tests}</p>
                     </div>
                   </td>

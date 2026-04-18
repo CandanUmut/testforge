@@ -12,14 +12,14 @@ export function LoadingSpinner({ size = 'md', className = '' }: LoadingSpinnerPr
 
   return (
     <div
-      className={`${sizeClasses[size]} rounded-full border-white/10 border-t-blue-500 animate-spin ${className}`}
+      className={`${sizeClasses[size]} rounded-full border-gray-200 border-t-indigo-600 animate-spin ${className}`}
     />
   );
 }
 
 export function FullPageSpinner() {
   return (
-    <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         <LoadingSpinner size="lg" />
         <p className="text-gray-500 text-sm">Loading...</p>

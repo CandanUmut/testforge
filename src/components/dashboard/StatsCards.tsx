@@ -11,20 +11,20 @@ interface StatsCardsProps {
 function TrendBadge({ value }: { value: number }) {
   if (value > 0) {
     return (
-      <span className="flex items-center gap-1 text-emerald-400 text-xs font-medium bg-emerald-400/10 border border-emerald-400/20 rounded-full px-2 py-0.5">
+      <span className="flex items-center gap-1 text-emerald-600 text-xs font-medium bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
         <TrendingUp className="w-3 h-3" />+{value}%
       </span>
     );
   }
   if (value < 0) {
     return (
-      <span className="flex items-center gap-1 text-red-400 text-xs font-medium bg-red-400/10 border border-red-400/20 rounded-full px-2 py-0.5">
+      <span className="flex items-center gap-1 text-red-600 text-xs font-medium bg-red-50 border border-red-200 rounded-full px-2 py-0.5">
         <TrendingDown className="w-3 h-3" />{value}%
       </span>
     );
   }
   return (
-    <span className="text-gray-500 text-xs font-medium bg-white/5 border border-white/10 rounded-full px-2 py-0.5">
+    <span className="text-gray-500 text-xs font-medium bg-gray-100 border border-gray-200 rounded-full px-2 py-0.5">
       —
     </span>
   );
@@ -112,8 +112,8 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
       label: 'Test Runs (7d)',
       value: stats?.totalRunsThisWeek ?? 0,
       trend: stats?.runsTrend,
-      color: 'text-blue-400',
-      iconBg: 'bg-blue-400/10 border-blue-400/20',
+      color: 'text-blue-600',
+      iconBg: 'bg-blue-50 border-blue-200',
       sparkColor: '#3B82F6',
       sparkData: sparkRuns,
     },
@@ -122,8 +122,8 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
       label: 'Pass Rate',
       value: `${stats?.passRate ?? 0}%`,
       trend: stats?.passRateTrend,
-      color: 'text-emerald-400',
-      iconBg: 'bg-emerald-400/10 border-emerald-400/20',
+      color: 'text-emerald-600',
+      iconBg: 'bg-emerald-50 border-emerald-200',
       sparkColor: '#10B981',
       sparkData: sparkPass,
     },
@@ -132,9 +132,9 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
       label: 'Active Devices',
       value: stats?.activeDevices ?? 0,
       trend: undefined,
-      color: 'text-purple-400',
-      iconBg: 'bg-purple-400/10 border-purple-400/20',
-      sparkColor: '#8B5CF6',
+      color: 'text-indigo-600',
+      iconBg: 'bg-indigo-50 border-indigo-200',
+      sparkColor: '#4f46e5',
       sparkData: sparkDevices,
     },
     {
@@ -142,10 +142,10 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
       label: 'Open Crashes',
       value: stats?.openCrashes ?? 0,
       trend: undefined,
-      color: stats?.openCrashes ? 'text-red-400' : 'text-gray-400',
+      color: stats?.openCrashes ? 'text-red-600' : 'text-gray-500',
       iconBg: stats?.openCrashes
-        ? 'bg-red-400/10 border-red-400/20'
-        : 'bg-gray-400/10 border-gray-400/20',
+        ? 'bg-red-50 border-red-200'
+        : 'bg-gray-50 border-gray-200',
       sparkColor: '#EF4444',
       sparkData: sparkCrashes,
     },
@@ -156,10 +156,10 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
       {cards.map((card, i) => {
         const Icon = card.icon;
         return (
-          <div key={i} className="glass-card p-5 flex flex-col gap-3">
+          <div key={i} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-3">
             {/* Header: label + icon */}
             <div className="flex items-center justify-between">
-              <p className="text-xs font-medium text-gray-400">{card.label}</p>
+              <p className="text-xs font-medium text-gray-500">{card.label}</p>
               <div
                 className={`w-8 h-8 rounded-lg border ${card.iconBg} flex items-center justify-center`}
               >
@@ -169,7 +169,7 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
 
             {/* Value + trend badge */}
             <div className="flex items-end justify-between">
-              <span className="text-2xl font-bold text-white">{card.value}</span>
+              <span className="text-2xl font-bold text-gray-900">{card.value}</span>
               {card.trend !== undefined ? (
                 <TrendBadge value={card.trend} />
               ) : null}

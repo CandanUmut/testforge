@@ -3,6 +3,7 @@ import {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
   createContext,
   useContext,
 } from 'react';
@@ -16,12 +17,12 @@ import {
   Cpu,
   BarChart3,
   Settings,
-  BookOpen,
   Smartphone,
   Zap,
   X,
 } from 'lucide-react';
-import { demoTestRuns, demoCrashes, demoDevices } from '../../utils/seedData';
+import { demoTestRuns, demoCrashes, demoDevices } from '../../lib/demo-data';
+import { useDataContext } from '../../contexts/DataContext';
 
 // ─── Context / Hook ───────────────────────────────────────────────────────────
 
@@ -54,21 +55,18 @@ interface CommandResult {
 
 // ─── Static page list ─────────────────────────────────────────────────────────
 
-const PAGES: CommandResult[] = [
-  { id: 'page-dashboard',    category: 'Pages', title: 'Dashboard',     subtitle: 'Overview & key metrics',          path: '/dashboard',    icon: <LayoutDashboard className="w-4 h-4" /> },
-  { id: 'page-test-runs',    category: 'Pages', title: 'Test Runs',     subtitle: 'Browse and inspect test runs',     path: '/test-runs',    icon: <PlayCircle className="w-4 h-4" /> },
-  { id: 'page-crash-triage', category: 'Pages', title: 'Crash Triage',  subtitle: 'Investigate & resolve crashes',    path: '/crash-triage', icon: <Bug className="w-4 h-4" /> },
-  { id: 'page-logs',         category: 'Pages', title: 'Log Explorer',  subtitle: 'Search device & test logs',        path: '/logs',         icon: <FileText className="w-4 h-4" /> },
-  { id: 'page-devices',      category: 'Pages', title: 'Devices',       subtitle: 'Manage connected devices',         path: '/devices',      icon: <Cpu className="w-4 h-4" /> },
-  { id: 'page-reports',      category: 'Pages', title: 'Reports',       subtitle: 'Trend charts & analytics',         path: '/reports',      icon: <BarChart3 className="w-4 h-4" /> },
-  { id: 'page-settings',     category: 'Pages', title: 'Settings',      subtitle: 'Organisation & API settings',      path: '/settings',     icon: <Settings className="w-4 h-4" /> },
-  { id: 'page-docs',         category: 'Pages', title: 'Docs',          subtitle: 'Open documentation',               path: '/docs',         icon: <BookOpen className="w-4 h-4" /> },
-];
+function buildIndex(basePath: string, getScopedPath: (section?: 'dashboard' | 'test-runs' | 'devices' | 'crash-triage' | 'logs' | 'reports' | 'settings') => string): CommandResult[] {
+  const pages: CommandResult[] = [
+    { id: 'page-dashboard', category: 'Pages', title: 'Dashboard', subtitle: 'Overview & key metrics', path: getScopedPath('dashboard'), icon: <LayoutDashboard className="w-4 h-4" /> },
+    { id: 'page-test-runs', category: 'Pages', title: 'Test Runs', subtitle: 'Browse and inspect test runs', path: getScopedPath('test-runs'), icon: <PlayCircle className="w-4 h-4" /> },
+    { id: 'page-crash-triage', category: 'Pages', title: 'Crash Triage', subtitle: 'Investigate & resolve crashes', path: getScopedPath('crash-triage'), icon: <Bug className="w-4 h-4" /> },
+    { id: 'page-logs', category: 'Pages', title: 'Log Explorer', subtitle: 'Search device & test logs', path: getScopedPath('logs'), icon: <FileText className="w-4 h-4" /> },
+    { id: 'page-devices', category: 'Pages', title: 'Devices', subtitle: 'Manage connected devices', path: getScopedPath('devices'), icon: <Cpu className="w-4 h-4" /> },
+    { id: 'page-reports', category: 'Pages', title: 'Reports', subtitle: 'Trend charts & analytics', path: getScopedPath('reports'), icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'page-settings', category: 'Pages', title: 'Settings', subtitle: 'Organisation & API settings', path: getScopedPath('settings'), icon: <Settings className="w-4 h-4" /> },
+  ];
 
-// ─── Build the full static index once (outside the component) ─────────────────
-
-function buildIndex(): CommandResult[] {
-  const results: CommandResult[] = [...PAGES];
+  const results: CommandResult[] = [...pages];
 
   for (const run of demoTestRuns.slice(0, 30)) {
     results.push({
@@ -76,7 +74,7 @@ function buildIndex(): CommandResult[] {
       category: 'Test Runs',
       title: run.name,
       subtitle: [run.branch, run.build_number, run.status].filter(Boolean).join(' · '),
-      path: `/test-runs/${run.id}`,
+      path: `${basePath}/test-runs/${run.id}`,
       icon: <PlayCircle className="w-4 h-4" />,
     });
   }
@@ -87,7 +85,7 @@ function buildIndex(): CommandResult[] {
       category: 'Crashes',
       title: crash.title,
       subtitle: [crash.severity, crash.status, crash.device?.name].filter(Boolean).join(' · '),
-      path: `/crash-triage/${crash.id}`,
+      path: getScopedPath('crash-triage'),
       icon: <Bug className="w-4 h-4" />,
     });
   }
@@ -98,15 +96,13 @@ function buildIndex(): CommandResult[] {
       category: 'Devices',
       title: device.name,
       subtitle: [device.device_type, device.status, device.firmware_version].filter(Boolean).join(' · '),
-      path: `/devices/${device.id}`,
+      path: getScopedPath('devices'),
       icon: <Smartphone className="w-4 h-4" />,
     });
   }
 
   return results;
 }
-
-const ALL_RESULTS = buildIndex();
 
 // ─── Fuzzy filter ─────────────────────────────────────────────────────────────
 
@@ -123,10 +119,10 @@ function fuzzyMatch(haystack: string, needle: string): boolean {
   return true;
 }
 
-function filterResults(query: string): CommandResult[] {
-  if (!query.trim()) return PAGES; // show pages by default
+function filterResults(query: string, allResults: CommandResult[], pageResults: CommandResult[]): CommandResult[] {
+  if (!query.trim()) return pageResults;
 
-  return ALL_RESULTS.filter(r =>
+  return allResults.filter(r =>
     fuzzyMatch(r.title, query) || fuzzyMatch(r.subtitle, query),
   );
 }
@@ -155,12 +151,15 @@ interface PaletteProps {
 
 function Palette({ onClose }: PaletteProps) {
   const navigate = useNavigate();
+  const { basePath, getScopedPath } = useDataContext();
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const results = filterResults(query);
+  const allResults = useMemo(() => buildIndex(basePath, getScopedPath), [basePath, getScopedPath]);
+  const pageResults = useMemo(() => allResults.filter((result): result is CommandResult => result.category === 'Pages'), [allResults]);
+  const results = filterResults(query, allResults, pageResults);
 
   // Group results by category, preserving insertion order
   const grouped = results.reduce<{ category: ResultCategory; items: CommandResult[] }[]>(
@@ -228,7 +227,7 @@ function Palette({ onClose }: PaletteProps) {
       <div
         className="
           w-full max-w-xl
-          bg-[#0F0F1A] border border-white/10 rounded-2xl shadow-2xl
+          bg-white border border-gray-200 rounded-2xl shadow-2xl
           flex flex-col overflow-hidden
           max-h-[80vh]
           /* mobile: full screen slide-up */
@@ -241,7 +240,7 @@ function Palette({ onClose }: PaletteProps) {
         onKeyDown={handleKeyDown}
       >
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-white/8">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200">
           <Search className="w-4 h-4 text-gray-500 flex-shrink-0" />
           <input
             ref={inputRef}
@@ -249,7 +248,7 @@ function Palette({ onClose }: PaletteProps) {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search test runs, crashes, devices..."
-            className="flex-1 bg-transparent text-white placeholder-gray-500 text-sm outline-none"
+            className="flex-1 bg-transparent text-gray-900 placeholder-gray-400 text-sm outline-none"
             autoComplete="off"
             spellCheck={false}
           />
@@ -259,7 +258,7 @@ function Palette({ onClose }: PaletteProps) {
             </button>
           )}
           <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded
-                          bg-white/5 border border-white/10 text-gray-500 text-[10px] font-mono">
+                          bg-gray-100 border border-gray-200 text-gray-400 text-[10px] font-mono">
             esc
           </kbd>
         </div>
@@ -292,19 +291,19 @@ function Palette({ onClose }: PaletteProps) {
                         onMouseEnter={() => setActiveIndex(idx)}
                         className={`
                           w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors
-                          ${isActive ? 'bg-white/8' : 'hover:bg-white/4'}
+                          ${isActive ? 'bg-gray-100' : 'hover:bg-gray-50'}
                         `}
                       >
                         <span className={`flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${CATEGORY_ICON_BG[item.category]}`}>
                           {item.icon}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-white truncate">{item.title}</p>
+                          <p className="text-sm text-gray-900 truncate">{item.title}</p>
                           <p className="text-xs text-gray-500 truncate">{item.subtitle}</p>
                         </div>
                         {isActive && (
-                          <kbd className="flex-shrink-0 px-1.5 py-0.5 rounded bg-white/5 border border-white/10
-                                         text-gray-500 text-[10px] font-mono hidden sm:inline-flex">
+                          <kbd className="flex-shrink-0 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200
+                                         text-gray-400 text-[10px] font-mono hidden sm:inline-flex">
                             ↵
                           </kbd>
                         )}
@@ -318,7 +317,7 @@ function Palette({ onClose }: PaletteProps) {
         </div>
 
         {/* Footer hint */}
-        <div className="flex items-center gap-4 px-4 py-2.5 border-t border-white/8 text-gray-600 text-[11px]">
+        <div className="flex items-center gap-4 px-4 py-2.5 border-t border-gray-200 text-gray-400 text-[11px]">
           <span className="flex items-center gap-1"><kbd className="font-mono">↑↓</kbd> navigate</span>
           <span className="flex items-center gap-1"><kbd className="font-mono">↵</kbd> select</span>
           <span className="flex items-center gap-1"><kbd className="font-mono">esc</kbd> close</span>
