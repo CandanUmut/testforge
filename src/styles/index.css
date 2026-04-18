@@ -12,9 +12,9 @@
   }
 
   body {
-    background-color: #0A0A0F;
-    color: white;
-    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #ffffff;
+    color: #0f172a;
+    font-family: "Inter", "SF Pro Display", system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -25,54 +25,54 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(148, 163, 184, 0.08);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(100, 116, 139, 0.28);
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(100, 116, 139, 0.4);
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/5 backdrop-blur-sm border border-white/8 rounded-xl;
+    @apply bg-white border border-gray-200 rounded-xl shadow-card;
   }
 
   .glass-card-hover {
-    @apply glass-card transition-all duration-300 hover:bg-white/8 hover:border-white/15;
+    @apply glass-card transition-all duration-300 hover:shadow-card-hover hover:border-gray-300 hover:-translate-y-0.5;
   }
 
   .btn-primary {
-    @apply bg-blue-500 hover:bg-blue-400 text-white font-medium px-6 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply bg-white/8 hover:bg-white/15 text-white font-medium px-6 py-2.5 rounded-lg border border-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/20;
+    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium px-6 py-2.5 rounded-lg border border-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-200 hover:scale-[1.02] active:scale-[0.98];
   }
 
   .btn-danger {
-    @apply bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium px-6 py-2.5 rounded-lg border border-red-500/20 transition-all duration-200;
+    @apply bg-red-50 hover:bg-red-100 text-red-600 font-medium px-6 py-2.5 rounded-lg border border-red-200 transition-all duration-200;
   }
 
   .input-field {
-    @apply w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200;
+    @apply w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200;
   }
 
   .label {
-    @apply block text-sm font-medium text-gray-400 mb-1.5;
+    @apply block text-sm font-medium text-gray-600 mb-1.5;
   }
 
   .section-title {
-    @apply text-3xl md:text-4xl font-bold text-white;
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tighter;
   }
 
   .section-subtitle {
-    @apply text-lg text-gray-400 max-w-2xl mx-auto;
+    @apply text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed;
   }
 
   .badge {
@@ -80,11 +80,11 @@
   }
 
   .table-row {
-    @apply border-b border-white/5 hover:bg-white/3 transition-colors duration-150;
+    @apply border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150;
   }
 
   .table-cell {
-    @apply px-4 py-3 text-sm;
+    @apply px-4 py-3 text-sm text-gray-700;
   }
 
   .table-header {
@@ -92,51 +92,21 @@
   }
 
   .sidebar-link {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/8 transition-all duration-200 font-medium text-sm;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200 font-medium text-sm;
   }
 
   .sidebar-link-active {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-400 bg-blue-500/10 border border-blue-500/20 font-medium text-sm;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 font-medium text-sm;
   }
 }
 
 @layer utilities {
-  .bg-white\/3 {
-    background-color: rgba(255, 255, 255, 0.03);
-  }
-  .bg-white\/4 {
-    background-color: rgba(255, 255, 255, 0.04);
-  }
-  .bg-white\/8 {
-    background-color: rgba(255, 255, 255, 0.08);
-  }
-  .bg-white\/15 {
-    background-color: rgba(255, 255, 255, 0.15);
-  }
-  .border-white\/8 {
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-  .border-white\/5 {
-    border-color: rgba(255, 255, 255, 0.05);
-  }
-  .hover\:bg-white\/3:hover {
-    background-color: rgba(255, 255, 255, 0.03);
-  }
-  .hover\:bg-white\/4:hover {
-    background-color: rgba(255, 255, 255, 0.04);
-  }
-  .hover\:bg-white\/8:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-  }
-  .bg-blue-500\/4 {
-    background-color: rgba(59, 130, 246, 0.04);
-  }
-  .hover\:bg-blue-500\/8:hover {
-    background-color: rgba(59, 130, 246, 0.08);
+  .text-balance {
+    text-wrap: balance;
   }
 
   .text-gradient-blue {
-    background: linear-gradient(135deg, #3B82F6, #60A5FA);
+    background: linear-gradient(135deg, #4f46e5, #818cf8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -147,14 +117,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-
-  .glow-blue {
-    box-shadow: 0 0 40px rgba(59, 130, 246, 0.15);
-  }
-
-  .glow-green {
-    box-shadow: 0 0 40px rgba(16, 185, 129, 0.15);
   }
 
   .terminal-scroll {

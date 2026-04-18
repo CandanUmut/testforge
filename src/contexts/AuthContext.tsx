@@ -3,21 +3,6 @@ import { supabase, isDemoMode } from '../lib/supabase';
 import type { Profile, Organization } from '../lib/types';
 import { demoOrganization } from '../utils/seedData';
 
-interface AuthContextValue {
-  user: { id: string; email: string } | null;
-  profile: Profile | null;
-  organization: Organization | null;
-  loading: boolean;
-  isDemoMode: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName: string, orgName: string) => Promise<{ error: Error | null }>;
-  signInWithGoogle: () => Promise<{ error: Error | null }>;
-  signOut: () => Promise<void>;
-  enterDemoMode: () => void;
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null);
-
 const DEMO_USER = {
   id: 'demo-user-001',
   email: 'demo@testforge.dev',
@@ -33,12 +18,27 @@ const DEMO_PROFILE: Profile = {
   updated_at: new Date().toISOString(),
 };
 
+interface AuthContextValue {
+  user: { id: string; email: string } | null;
+  profile: Profile | null;
+  organization: Organization | null;
+  loading: boolean;
+  isLoading: boolean;
+  error: string | null;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string, orgName: string) => Promise<{ error: Error | null }>;
+  signInWithGoogle: () => Promise<{ error: Error | null }>;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<{ id: string; email: string } | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isDemo, setIsDemo] = useState(isDemoMode);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isDemoMode) {
@@ -76,11 +76,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function loadProfile(userId: string) {
     try {
-      const { data: profileData } = await supabase
+      setError(null);
+      const { data: profileData, error: profileErr } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
+
+      if (profileErr) {
+        setError(profileErr.message);
+        return;
+      }
 
       if (profileData) {
         setProfile(profileData);
@@ -93,79 +99,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (orgData) setOrganization(orgData);
         }
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load profile');
     } finally {
       setLoading(false);
     }
   }
 
-  function enterDemoMode() {
-    setIsDemo(true);
-    setUser(DEMO_USER);
-    setProfile(DEMO_PROFILE);
-    setOrganization(demoOrganization);
-  }
-
   async function signIn(email: string, password: string) {
     if (isDemoMode) {
-      enterDemoMode();
-      return { error: null };
+      return { error: new Error('Supabase credentials are not configured. Use demo mode instead.') };
     }
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error as Error | null };
+    setError(null);
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInError) {
+      setError(signInError.message);
+      return { error: signInError as Error };
+    }
+    // Redirect to dashboard — handled by the caller after successful login
+    // The caller should navigate to /#/app/dashboard
+    return { error: null };
   }
 
   async function signUp(email: string, password: string, fullName: string, orgName: string) {
     if (isDemoMode) {
-      enterDemoMode();
-      return { error: null };
+      return { error: new Error('Supabase credentials are not configured. Use demo mode instead.') };
     }
 
-    const slug = orgName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    setError(null);
 
+    // The DB trigger handle_new_user() will auto-create org + profile on signup
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName } },
+      options: { data: { full_name: fullName, org_name: orgName } },
     });
 
-    if (signUpError) return { error: signUpError as Error };
-    if (!authData.user) return { error: new Error('Signup failed') };
-
-    // Create organization
-    const { data: orgData, error: orgError } = await supabase
-      .from('organizations')
-      .insert({ name: orgName, slug, plan: 'starter' })
-      .select()
-      .single();
-
-    if (orgError) return { error: orgError as Error };
-
-    // Link profile to org
-    await supabase
-      .from('profiles')
-      .update({ organization_id: orgData.id, full_name: fullName, role: 'owner' })
-      .eq('id', authData.user.id);
+    if (signUpError) {
+      setError(signUpError.message);
+      return { error: signUpError as Error };
+    }
+    if (!authData.user) {
+      const err = new Error('Signup failed');
+      setError(err.message);
+      return { error: err };
+    }
 
     return { error: null };
   }
 
   async function signInWithGoogle() {
     if (isDemoMode) {
-      enterDemoMode();
-      return { error: null };
+      return { error: new Error('Supabase credentials are not configured. Use demo mode instead.') };
     }
-    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
-    return { error: error as Error | null };
+    setError(null);
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+    if (oauthError) {
+      setError(oauthError.message);
+    }
+    return { error: oauthError as Error | null };
   }
 
   async function signOut() {
-    if (isDemo) {
-      setUser(null);
-      setProfile(null);
-      setOrganization(null);
-      setIsDemo(isDemoMode);
-      return;
-    }
+    setError(null);
     await supabase.auth.signOut();
   }
 
@@ -175,12 +171,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       profile,
       organization,
       loading,
-      isDemoMode: isDemo,
+      isLoading: loading,
+      error,
       signIn,
       signUp,
       signInWithGoogle,
       signOut,
-      enterDemoMode,
     }}>
       {children}
     </AuthContext.Provider>

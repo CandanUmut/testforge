@@ -1,4 +1,18 @@
--- 004_create_test_runs.sql
+-- 004_create_test_suites_and_test_runs.sql
+
+-- Test Suites
+CREATE TABLE test_suites (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    description TEXT,
+    category TEXT CHECK (category IN ('smoke', 'regression', 'stress', 'qualification', 'validation', 'custom')),
+    estimated_duration_seconds INTEGER,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_suites_org ON test_suites(organization_id);
+
+-- Test Runs
 CREATE TABLE test_runs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,

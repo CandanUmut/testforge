@@ -19,8 +19,9 @@ import {
   X,
   CheckCheck,
 } from 'lucide-react';
-import { demoAlerts } from '../../utils/seedData';
+import { demoAlerts } from '../../lib/demo-data';
 import type { Alert, AlertType } from '../../lib/types';
+import { useDataContext } from '../../contexts/DataContext';
 
 // ─── Alert type → icon / colour config ───────────────────────────────────────
 
@@ -52,16 +53,16 @@ function getAlertConfig(type: AlertType): AlertConfig {
 
 // ─── Route mapping ─────────────────────────────────────────────────────────────
 
-function alertPath(type: AlertType): string {
+function alertPath(type: AlertType, getScopedPath: (section?: 'dashboard' | 'test-runs' | 'devices' | 'crash-triage' | 'logs' | 'reports' | 'settings') => string): string {
   switch (type) {
-    case 'crash_detected':   return '/crash-triage';
-    case 'test_failure':     return '/test-runs';
-    case 'device_offline':   return '/devices';
-    case 'threshold_breach': return '/reports';
-    case 'flaky_test':       return '/test-runs';
-    case 'build_failed':     return '/test-runs';
-    case 'system':           return '/dashboard';
-    default:                 return '/dashboard';
+    case 'crash_detected':   return getScopedPath('crash-triage');
+    case 'test_failure':     return getScopedPath('test-runs');
+    case 'device_offline':   return getScopedPath('devices');
+    case 'threshold_breach': return getScopedPath('reports');
+    case 'flaky_test':       return getScopedPath('test-runs');
+    case 'build_failed':     return getScopedPath('test-runs');
+    case 'system':           return getScopedPath('dashboard');
+    default:                 return getScopedPath('dashboard');
   }
 }
 
@@ -148,6 +149,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 export function NotificationCenter() {
   const { open, setOpen, notifications, unreadCount, markAllRead, markRead } = useNotifications();
   const navigate = useNavigate();
+  const { getScopedPath } = useDataContext();
   const panelRef = useRef<HTMLDivElement>(null);
 
   // Close on Escape
@@ -163,7 +165,7 @@ export function NotificationCenter() {
   const handleNotificationClick = (n: Alert) => {
     markRead(n.id);
     setOpen(false);
-    navigate(alertPath(n.type));
+    navigate(alertPath(n.type, getScopedPath));
   };
 
   // Group notifications by time bucket
@@ -192,16 +194,16 @@ export function NotificationCenter() {
         className="
           fixed top-0 right-0 h-full z-50
           w-full sm:w-96
-          bg-[#0F0F1A] border-l border-white/8
+          bg-white border-l border-gray-200
           flex flex-col
           shadow-2xl
           animate-slide-in-right
         "
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/8 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <h2 className="text-white font-semibold text-base">Notifications</h2>
+            <h2 className="text-gray-900 font-semibold text-base">Notifications</h2>
             {unreadCount > 0 && (
               <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white text-[10px] font-bold">
                 {unreadCount > 9 ? '9+' : unreadCount}
@@ -212,7 +214,7 @@ export function NotificationCenter() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                className="flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-700 transition-colors"
               >
                 <CheckCheck className="w-3.5 h-3.5" />
                 Mark all read
@@ -220,7 +222,7 @@ export function NotificationCenter() {
             )}
             <button
               onClick={() => setOpen(false)}
-              className="ml-1 text-gray-500 hover:text-white transition-colors"
+              className="ml-1 text-gray-400 hover:text-gray-900 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -234,8 +236,8 @@ export function NotificationCenter() {
               <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
                 <Check className="w-6 h-6 text-emerald-400" />
               </div>
-              <p className="text-sm font-medium text-gray-400">All caught up!</p>
-              <p className="text-xs text-gray-600">No notifications to show</p>
+              <p className="text-sm font-medium text-gray-700">All caught up!</p>
+              <p className="text-xs text-gray-500">No notifications to show</p>
             </div>
           ) : (
             grouped.map(({ bucket, items }) => (
@@ -253,8 +255,8 @@ export function NotificationCenter() {
                       onClick={() => handleNotificationClick(n)}
                       className={`
                         w-full flex items-start gap-3 px-5 py-3.5 text-left
-                        transition-colors border-b border-white/4
-                        ${n.is_read ? 'hover:bg-white/3' : 'bg-blue-500/4 hover:bg-blue-500/8'}
+                        transition-colors border-b border-gray-100
+                        ${n.is_read ? 'hover:bg-gray-50' : 'bg-indigo-50/50 hover:bg-indigo-50'}
                       `}
                     >
                       {/* Icon */}
@@ -265,7 +267,7 @@ export function NotificationCenter() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <p className={`text-sm font-medium leading-snug truncate ${n.is_read ? 'text-gray-300' : 'text-white'}`}>
+                          <p className={`text-sm font-medium leading-snug truncate ${n.is_read ? 'text-gray-500' : 'text-gray-900'}`}>
                             {n.title}
                           </p>
                           {/* Unread dot */}

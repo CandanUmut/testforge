@@ -1,6 +1,101 @@
 -- 011_seed_demo_data.sql
--- Creates a demo organization with realistic test data
+-- Enhanced handle_new_user trigger, dashboard stats RPC, and demo seed data
 -- Run after migrations 001-010 have been applied
+
+-- ─── Enhanced handle_new_user trigger ────────────────────────────────────────
+-- Creates an organization on signup and a profile linked to that org with role 'owner'
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+DECLARE
+    new_org_id UUID;
+    user_name TEXT;
+    org_slug TEXT;
+BEGIN
+    user_name := COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1));
+    org_slug := lower(regexp_replace(split_part(NEW.email, '@', 2), '[^a-z0-9]', '-', 'g'))
+                || '-' || substr(NEW.id::text, 1, 8);
+
+    -- Create a default organization for the new user
+    INSERT INTO public.organizations (name, slug, plan)
+    VALUES (user_name || '''s Organization', org_slug, 'starter')
+    RETURNING id INTO new_org_id;
+
+    -- Create profile linked to that org with owner role
+    INSERT INTO public.profiles (id, email, full_name, organization_id, role)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        user_name,
+        new_org_id,
+        'owner'
+    );
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Re-create the trigger (drop if exists from migration 002)
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+-- ─── Dashboard stats RPC ─────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION get_dashboard_stats(org_uuid UUID)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+    week_start TIMESTAMPTZ := date_trunc('week', now());
+    prev_week_start TIMESTAMPTZ := date_trunc('week', now() - interval '7 days');
+BEGIN
+    SELECT json_build_object(
+        'totalRunsThisWeek', (
+            SELECT COUNT(*) FROM test_runs
+            WHERE organization_id = org_uuid AND created_at >= week_start
+        ),
+        'passRate', (
+            SELECT COALESCE(
+                ROUND(COUNT(*) FILTER (WHERE status = 'passed')::numeric /
+                      NULLIF(COUNT(*) FILTER (WHERE status IN ('passed','failed','error','timeout')), 0) * 100, 1),
+                0
+            )
+            FROM test_runs
+            WHERE organization_id = org_uuid AND created_at >= week_start
+        ),
+        'activeDevices', (
+            SELECT COUNT(*) FROM devices
+            WHERE organization_id = org_uuid AND status IN ('online', 'testing')
+        ),
+        'openCrashes', (
+            SELECT COUNT(*) FROM crashes
+            WHERE organization_id = org_uuid AND status NOT IN ('fixed', 'wont_fix', 'duplicate')
+        ),
+        'passRateTrend', (
+            SELECT COALESCE(
+                ROUND(
+                    (COUNT(*) FILTER (WHERE status = 'passed' AND created_at >= week_start)::numeric /
+                     NULLIF(COUNT(*) FILTER (WHERE status IN ('passed','failed','error','timeout') AND created_at >= week_start), 0) * 100)
+                    -
+                    (COUNT(*) FILTER (WHERE status = 'passed' AND created_at >= prev_week_start AND created_at < week_start)::numeric /
+                     NULLIF(COUNT(*) FILTER (WHERE status IN ('passed','failed','error','timeout') AND created_at >= prev_week_start AND created_at < week_start), 0) * 100)
+                , 1),
+                0
+            )
+            FROM test_runs
+            WHERE organization_id = org_uuid
+        ),
+        'runsTrend', (
+            SELECT COALESCE(
+                (SELECT COUNT(*) FROM test_runs WHERE organization_id = org_uuid AND created_at >= week_start) -
+                (SELECT COUNT(*) FROM test_runs WHERE organization_id = org_uuid AND created_at >= prev_week_start AND created_at < week_start),
+                0
+            )
+        )
+    ) INTO result;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
 -- Create demo org
 INSERT INTO organizations (id, name, slug, plan) VALUES

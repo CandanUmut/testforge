@@ -479,11 +479,11 @@ token = resp.json()["access_token"]`,
 // ─── Helper components ─────────────────────────────────────────────────────────
 
 const METHOD_COLORS: Record<string, string> = {
-  GET: 'text-emerald-400 bg-emerald-400/10',
-  POST: 'text-blue-400 bg-blue-400/10',
-  PUT: 'text-amber-400 bg-amber-400/10',
-  PATCH: 'text-purple-400 bg-purple-400/10',
-  DELETE: 'text-red-400 bg-red-400/10',
+  GET: 'text-emerald-700 bg-emerald-50',
+  POST: 'text-blue-700 bg-blue-50',
+  PUT: 'text-amber-700 bg-amber-50',
+  PATCH: 'text-indigo-700 bg-indigo-50',
+  DELETE: 'text-red-700 bg-red-50',
 };
 
 function MethodBadge({ method }: { method: string }) {
@@ -504,7 +504,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={copy}
-      className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors"
+      className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 transition-colors"
     >
       {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
       {copied ? 'Copied' : 'Copy'}
@@ -515,7 +515,7 @@ function CopyButton({ text }: { text: string }) {
 function CodeBlock({ code, lang }: { code: string; lang: string }) {
   return (
     <div className="relative">
-      <pre className={`text-xs font-mono text-gray-300 overflow-x-auto whitespace-pre language-${lang}`}>
+      <pre className={`text-xs font-mono text-gray-700 overflow-x-auto whitespace-pre language-${lang}`}>
         {code}
       </pre>
     </div>
@@ -526,9 +526,9 @@ function ParamTable({ params, title }: { params: Param[]; title: string }) {
   return (
     <div>
       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{title}</p>
-      <div className="rounded-lg border border-white/8 overflow-hidden">
+      <div className="rounded-lg border border-gray-200 overflow-hidden">
         <table className="w-full text-xs">
-          <thead className="bg-white/4">
+          <thead className="bg-gray-50">
             <tr>
               <th className="text-left px-3 py-2 text-gray-400 font-medium">Name</th>
               <th className="text-left px-3 py-2 text-gray-400 font-medium">Type</th>
@@ -538,9 +538,9 @@ function ParamTable({ params, title }: { params: Param[]; title: string }) {
           </thead>
           <tbody>
             {params.map((p, i) => (
-              <tr key={p.name} className={i % 2 === 0 ? '' : 'bg-white/2'}>
-                <td className="px-3 py-2 font-mono text-blue-300">{p.name}</td>
-                <td className="px-3 py-2 font-mono text-purple-300">{p.type}</td>
+              <tr key={p.name} className={i % 2 === 0 ? '' : 'bg-gray-50/50'}>
+                <td className="px-3 py-2 font-mono text-blue-600">{p.name}</td>
+                <td className="px-3 py-2 font-mono text-indigo-600">{p.type}</td>
                 <td className="px-3 py-2">
                   {p.required
                     ? <span className="text-red-400 font-semibold">yes</span>
@@ -561,14 +561,14 @@ function EndpointCard({ endpoint }: { endpoint: Endpoint }) {
   const example = endpoint.examples[activeTab];
 
   return (
-    <div id={endpoint.id} className="bg-white/4 rounded-xl border border-white/8 overflow-hidden">
+    <div id={endpoint.id} className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-white/8">
+      <div className="px-5 py-4 border-b border-gray-200">
         <div className="flex items-center gap-3 mb-2">
           <MethodBadge method={endpoint.method} />
-          <code className="text-sm font-mono text-white">{endpoint.path}</code>
+          <code className="text-sm font-mono text-gray-900">{endpoint.path}</code>
         </div>
-        <p className="text-sm font-semibold text-white">{endpoint.summary}</p>
+        <p className="text-sm font-semibold text-gray-900">{endpoint.summary}</p>
         <p className="text-xs text-gray-400 mt-1">{endpoint.description}</p>
       </div>
 
@@ -592,8 +592,8 @@ function EndpointCard({ endpoint }: { endpoint: Endpoint }) {
                   onClick={() => setActiveTab(i)}
                   className={`text-xs px-3 py-1 rounded-full border transition-colors ${
                     i === activeTab
-                      ? 'bg-blue-500/20 border-blue-500/40 text-blue-300'
-                      : 'border-white/10 text-gray-400 hover:text-white'
+                      ? 'bg-indigo-50 border-indigo-200 text-blue-600'
+                      : 'border-gray-200 text-gray-400 hover:text-gray-700'
                   }`}
                 >
                   {ex.label}
@@ -601,7 +601,7 @@ function EndpointCard({ endpoint }: { endpoint: Endpoint }) {
               ))}
             </div>
           )}
-          <div className="bg-gray-950 rounded-lg border border-white/8 p-4">
+          <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-gray-500">{example.label}</span>
               <CopyButton text={example.code} />
@@ -613,7 +613,7 @@ function EndpointCard({ endpoint }: { endpoint: Endpoint }) {
         {/* Response */}
         <div>
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Response</p>
-          <div className="bg-gray-950 rounded-lg border border-white/8 p-4">
+          <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-emerald-400">200 OK</span>
               <CopyButton text={endpoint.response} />
@@ -636,21 +636,21 @@ export function Docs() {
   return (
     <div className="flex h-full min-h-0">
       {/* Sidebar */}
-      <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-white/8 overflow-y-auto">
+      <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-gray-200 overflow-y-auto">
         {/* API info */}
-        <div className="p-4 border-b border-white/8">
+        <div className="p-4 border-b border-gray-200">
           <div className="flex items-center gap-2 mb-1">
             <Code2 size={14} className="text-blue-400" />
-            <span className="text-xs font-semibold text-white">REST API v1</span>
+            <span className="text-xs font-semibold text-gray-900">REST API v1</span>
           </div>
           <p className="text-xs text-gray-500 font-mono">{BASE_URL}</p>
         </div>
 
         {/* Auth note */}
-        <div className="px-4 py-3 border-b border-white/8">
+        <div className="px-4 py-3 border-b border-gray-200">
           <div className="flex items-start gap-2">
             <Lock size={12} className="text-amber-400 mt-0.5 shrink-0" />
-            <p className="text-xs text-gray-400">All endpoints require <code className="text-amber-300">Authorization: Bearer &lt;token&gt;</code></p>
+            <p className="text-xs text-gray-400">All endpoints require <code className="text-amber-700">Authorization: Bearer &lt;token&gt;</code></p>
           </div>
         </div>
 
@@ -665,8 +665,8 @@ export function Docs() {
                 onClick={() => setActiveCategory(cat.id)}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors ${
                   active
-                    ? 'bg-blue-500/15 text-blue-300'
-                    : 'text-gray-400 hover:text-white hover:bg-white/4'
+                    ? 'bg-indigo-50 text-blue-600'
+                    : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 <Icon size={14} />
@@ -678,10 +678,10 @@ export function Docs() {
         </nav>
 
         {/* Footer links */}
-        <div className="p-4 border-t border-white/8 space-y-2">
+        <div className="p-4 border-t border-gray-200 space-y-2">
           <a
             href="https://testforge.io/changelog"
-            className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-700 transition-colors"
           >
             <Terminal size={12} />
             Changelog
@@ -689,7 +689,7 @@ export function Docs() {
           </a>
           <a
             href="https://status.testforge.io"
-            className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-700 transition-colors"
           >
             <Zap size={12} />
             Status page
@@ -699,7 +699,7 @@ export function Docs() {
       </aside>
 
       {/* Mobile category selector */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-10 bg-gray-900 border-t border-white/8 flex overflow-x-auto">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-10 bg-white border-t border-gray-200 flex overflow-x-auto">
         {CATEGORIES.map(cat => {
           const Icon = cat.icon;
           return (
@@ -721,7 +721,7 @@ export function Docs() {
       <main className="flex-1 overflow-y-auto p-6 pb-20 lg:pb-6">
         {/* Page header */}
         <div className="mb-6">
-          <h1 className="text-xl font-bold text-white">API Documentation</h1>
+          <h1 className="text-xl font-bold text-gray-900">API Documentation</h1>
           <p className="text-sm text-gray-400 mt-1">
             Integrate TestForge into your CI/CD pipeline, scripts, and custom tooling.
           </p>
@@ -731,7 +731,7 @@ export function Docs() {
         <div className="flex items-center gap-3 mb-5">
           {(() => { const Icon = category.icon; return <Icon size={18} className="text-blue-400" />; })()}
           <div>
-            <h2 className="text-base font-semibold text-white">{category.label}</h2>
+            <h2 className="text-base font-semibold text-gray-900">{category.label}</h2>
             <p className="text-xs text-gray-500">{category.endpoints.length} endpoint{category.endpoints.length !== 1 ? 's' : ''}</p>
           </div>
         </div>

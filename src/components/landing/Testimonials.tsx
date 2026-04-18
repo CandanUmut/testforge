@@ -1,63 +1,42 @@
-import { Quote } from 'lucide-react';
-
 const testimonials = [
   {
-    quote: 'TestForge cut our triage time from hours to minutes. When a kernel panic hits at 2am, we know exactly what failed and why before we\'ve even had coffee.',
-    name: 'Senior Firmware Engineer',
-    company: 'Series B IoT company (stealth)',
-    initials: 'FE',
-    color: 'text-blue-400 bg-blue-400/10',
+    quote: 'We went from spending 2 days a week on crash triage to 2 hours. The automated stack trace deduplication alone paid for itself.',
+    role: 'Test Lead, Mobile Device Lab',
   },
   {
-    quote: 'We were maintaining three separate test frameworks for different device families. TestForge unified everything. Our CI now catches regressions before they hit QA.',
-    name: 'Lead QA Engineer',
-    company: 'Embedded systems startup',
-    initials: 'QA',
-    color: 'text-emerald-400 bg-emerald-400/10',
+    quote: 'Setting up firmware validation used to take a new engineer 3 months to learn. With a proper pipeline, we were running automated nightly tests in the first week.',
+    role: 'Engineering Manager, Embedded Systems',
   },
   {
-    quote: 'The flaky test detection alone saved us weeks. We had tests that were "probably fine" for 18 months. TestForge found 12 real intermittent failures hiding in there.',
-    name: 'Engineering Manager',
-    company: 'Hardware startup, Series A',
-    initials: 'EM',
-    color: 'text-purple-400 bg-purple-400/10',
+    quote: 'We test across 30 device variants nightly now instead of 5 manually. That is the difference between catching a regression before release and after.',
+    role: 'QA Director, Consumer Electronics',
   },
 ];
 
 export function Testimonials() {
   return (
-    <section className="py-24 px-4 sm:px-6 bg-gradient-to-b from-transparent to-white/[0.02]">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="text-sm font-semibold text-blue-400 uppercase tracking-widest mb-4">
-            Early feedback
-          </p>
-          <h2 className="section-title mb-4">
-            Engineers who've{' '}
-            <span className="text-gradient-blue">been in the trenches.</span>
+    <section id="testimonials" className="bg-white px-4 py-24 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="max-w-3xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-indigo-600">What Teams Say</p>
+          <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-slate-950">
+            Based on real problems solved during 6 years of test automation engineering.
           </h2>
-          <p className="text-gray-500 text-sm italic mt-2">
-            Names anonymized — we're early. Ask us for references.
-          </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
-            <div key={i} className="glass-card p-6 flex flex-col">
-              <Quote className="w-8 h-8 text-gray-700 mb-4" />
-              <p className="text-gray-300 leading-relaxed flex-1 mb-6">"{t.quote}"</p>
-              <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-                <div className={`w-9 h-9 rounded-full ${t.color} flex items-center justify-center text-xs font-bold`}>
-                  {t.initials}
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-white">{t.name}</p>
-                  <p className="text-xs text-gray-500">{t.company}</p>
-                </div>
-              </div>
-            </div>
+        <div className="mt-12 grid gap-6 lg:grid-cols-3">
+          {testimonials.map(item => (
+            <blockquote key={item.role} className="rounded-2xl border border-gray-200 bg-white p-8 shadow-card transition hover:-translate-y-0.5 hover:shadow-card-hover">
+              <div className="mb-4 text-indigo-400 text-3xl leading-none">"</div>
+              <p className="text-base leading-7 text-gray-700">{item.quote}</p>
+              <footer className="mt-6 text-sm font-medium text-gray-500 border-t border-gray-100 pt-4">{item.role}</footer>
+            </blockquote>
           ))}
         </div>
+
+        <p className="mt-8 text-center text-sm text-gray-400 italic">
+          These are representative quotes based on real problems — not customer testimonials.
+        </p>
       </div>
     </section>
   );

@@ -11,18 +11,18 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   if (!active || !payload?.length) return null;
   const item = payload[0];
   return (
-    <div className="glass-card px-3 py-2 text-xs">
-      <p className="text-white font-medium">{item.name}</p>
-      <p className="text-gray-400 mt-1">{item.value.toLocaleString()} failures</p>
+    <div className="bg-white rounded-xl border border-gray-200 shadow-lg px-3 py-2 text-xs">
+      <p className="text-gray-900 font-medium">{item.name}</p>
+      <p className="text-gray-500 mt-1">{item.value.toLocaleString()} failures</p>
     </div>
   );
 }
 
 export function FailureCategoryPie({ data, loading }: FailureCategoryPieProps) {
   return (
-    <div className="glass-card p-6 h-80">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 h-80">
       <div className="mb-6">
-        <h3 className="text-sm font-semibold text-white">Failure Categories</h3>
+        <h3 className="text-sm font-semibold text-gray-900">Failure Categories</h3>
         <p className="text-xs text-gray-500 mt-0.5">Distribution by test suite</p>
       </div>
 
@@ -55,7 +55,7 @@ export function FailureCategoryPie({ data, loading }: FailureCategoryPieProps) {
               iconType="circle"
               iconSize={6}
               formatter={(value: string) => (
-                <span style={{ color: '#9CA3AF', fontSize: '11px' }}>{value}</span>
+                <span style={{ color: '#6b7280', fontSize: '11px' }}>{value}</span>
               )}
             />
           </PieChart>

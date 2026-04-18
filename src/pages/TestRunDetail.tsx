@@ -11,8 +11,9 @@ import { StatusBadge } from '../components/common/Badge';
 import { formatDuration, formatDateTime, formatPassRate } from '../utils/formatters';
 import { LOG_LEVEL_COLORS } from '../utils/constants';
 import type { TestStatus, TestCategory } from '../lib/types';
+import { useDataContext } from '../contexts/DataContext';
 
-// ─── Mock result generation ────────────────────────────────────────────────────
+// --- Mock result generation ---
 
 interface MockTestResult {
   id: string;
@@ -122,12 +123,10 @@ function generateMockResults(
   const rng = seededRandom(runId.split('').reduce((a, c) => a + c.charCodeAt(0), 0));
   const suite = TEST_NAMES_BY_SUITE[suiteName] ?? TEST_NAMES_BY_SUITE['smoke'];
 
-  // Flatten all names across categories, tag each with its category
   const pool: { name: string; category: TestCategory }[] = suite.flatMap(g =>
     g.names.map(n => ({ name: n, category: g.category }))
   );
 
-  // Repeat pool until we have enough entries
   const expanded: { name: string; category: TestCategory }[] = [];
   while (expanded.length < total) {
     for (const item of pool) {
@@ -136,7 +135,6 @@ function generateMockResults(
     }
   }
 
-  // Assign statuses deterministically
   const failedIndices = new Set<number>();
   const skippedIndices = new Set<number>();
 
@@ -169,7 +167,7 @@ function generateMockResults(
   });
 }
 
-// ─── Donut chart ───────────────────────────────────────────────────────────────
+// --- Donut chart ---
 
 function PassRateDonut({ passed, total }: { passed: number; total: number }) {
   const pct = total > 0 ? passed / total : 0;
@@ -183,7 +181,7 @@ function PassRateDonut({ passed, total }: { passed: number; total: number }) {
   return (
     <div className="flex flex-col items-center gap-2">
       <svg width="96" height="96" className="-rotate-90">
-        <circle cx="48" cy="48" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
+        <circle cx="48" cy="48" r={r} fill="none" stroke="#e5e7eb" strokeWidth="8" />
         <circle
           cx="48"
           cy="48"
@@ -196,14 +194,14 @@ function PassRateDonut({ passed, total }: { passed: number; total: number }) {
         />
       </svg>
       <div className="text-center -mt-1">
-        <p className="text-2xl font-bold text-white">{Math.round(pct * 100)}%</p>
+        <p className="text-2xl font-bold text-gray-900">{Math.round(pct * 100)}%</p>
         <p className="text-xs text-gray-500">pass rate</p>
       </div>
     </div>
   );
 }
 
-// ─── Category group ────────────────────────────────────────────────────────────
+// --- Category group ---
 
 interface CategoryGroupProps {
   category: TestCategory;
@@ -225,53 +223,53 @@ function CategoryGroup({ category, results }: CategoryGroupProps) {
   const skipCount = results.filter(r => r.status === 'skipped').length;
 
   return (
-    <div className="border border-white/8 rounded-lg overflow-hidden">
+    <div className="border border-gray-200 rounded-lg overflow-hidden">
       <button
         onClick={() => setExpanded(e => !e)}
-        className="w-full flex items-center gap-3 px-4 py-3 bg-white/[0.03] hover:bg-white/[0.05] transition-colors text-left"
+        className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
       >
         {expanded ? (
-          <ChevronDown className="w-4 h-4 text-gray-500 flex-shrink-0" />
+          <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
         ) : (
-          <ChevronRight className="w-4 h-4 text-gray-500 flex-shrink-0" />
+          <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
         )}
-        <span className="text-sm font-medium text-white capitalize flex-1">{category}</span>
+        <span className="text-sm font-medium text-gray-900 capitalize flex-1">{category}</span>
         <div className="flex items-center gap-3 text-xs">
           {failCount > 0 && (
-            <span className="text-red-400">{failCount} failed</span>
+            <span className="text-red-500">{failCount} failed</span>
           )}
           {skipCount > 0 && (
             <span className="text-gray-500">{skipCount} skipped</span>
           )}
-          <span className="text-gray-600">{passCount}/{results.length}</span>
+          <span className="text-gray-400">{passCount}/{results.length}</span>
         </div>
       </button>
 
       {expanded && (
-        <div className="divide-y divide-white/[0.04]">
+        <div className="divide-y divide-gray-100">
           {sorted.map(result => (
             <div
               key={result.id}
-              className="flex items-start gap-3 px-4 py-2.5 hover:bg-white/[0.02] transition-colors"
+              className="flex items-start gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
             >
               <div className="mt-0.5 flex-shrink-0">
                 {result.status === 'passed' ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                 ) : result.status === 'skipped' ? (
-                  <MinusCircle className="w-4 h-4 text-gray-500" />
+                  <MinusCircle className="w-4 h-4 text-gray-400" />
                 ) : (
-                  <XCircle className="w-4 h-4 text-red-400" />
+                  <XCircle className="w-4 h-4 text-red-500" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-300 font-mono truncate">{result.test_name}</p>
+                <p className="text-xs text-gray-700 font-mono truncate">{result.test_name}</p>
                 {result.error_message && (
-                  <p className="text-xs text-red-400/70 mt-0.5 truncate">{result.error_message}</p>
+                  <p className="text-xs text-red-500 mt-0.5 truncate">{result.error_message}</p>
                 )}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <StatusBadge status={result.status} />
-                <span className="text-xs text-gray-600 font-mono w-14 text-right">
+                <span className="text-xs text-gray-400 font-mono w-14 text-right">
                   {formatDuration(result.duration_ms)}
                 </span>
               </div>
@@ -283,11 +281,12 @@ function CategoryGroup({ category, results }: CategoryGroupProps) {
   );
 }
 
-// ─── Main page ─────────────────────────────────────────────────────────────────
+// --- Main page ---
 
 export function TestRunDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { basePath, getScopedPath } = useDataContext();
   const [rerunTooltip, setRerunTooltip] = useState(false);
 
   const run = useMemo(
@@ -329,17 +328,17 @@ export function TestRunDetail() {
     return (
       <div className="p-6">
         <button
-          onClick={() => navigate('/test-runs')}
-          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-8"
+          onClick={() => navigate(getScopedPath('test-runs'))}
+          className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
           Test Runs
         </button>
-        <div className="glass-card p-12 flex flex-col items-center justify-center gap-4 text-center">
-          <Zap className="w-10 h-10 text-gray-600" />
-          <p className="text-lg font-semibold text-white">Run not found</p>
-          <p className="text-sm text-gray-500">No test run with ID <span className="font-mono text-gray-400">{id}</span> exists.</p>
-          <button onClick={() => navigate('/test-runs')} className="btn-secondary mt-2">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 flex flex-col items-center justify-center gap-4 text-center">
+          <Zap className="w-10 h-10 text-gray-300" />
+          <p className="text-lg font-semibold text-gray-900">Run not found</p>
+          <p className="text-sm text-gray-500">No test run with ID <span className="font-mono text-gray-700">{id}</span> exists.</p>
+          <button onClick={() => navigate(getScopedPath('test-runs'))} className="btn-secondary mt-2">
             Back to Test Runs
           </button>
         </div>
@@ -357,8 +356,8 @@ export function TestRunDetail() {
       {/* Back + Re-run */}
       <div className="flex items-center justify-between">
         <button
-          onClick={() => navigate('/test-runs')}
-          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+          onClick={() => navigate(getScopedPath('test-runs'))}
+          className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Test Runs
@@ -366,7 +365,7 @@ export function TestRunDetail() {
 
         <div className="relative">
           <button
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-400 cursor-not-allowed opacity-60"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-400 cursor-not-allowed opacity-60"
             onMouseEnter={() => setRerunTooltip(true)}
             onMouseLeave={() => setRerunTooltip(false)}
             disabled
@@ -375,7 +374,7 @@ export function TestRunDetail() {
             Re-run
           </button>
           {rerunTooltip && (
-            <div className="absolute right-0 top-full mt-2 z-10 bg-[#1a1a2e] border border-white/10 text-xs text-gray-300 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
+            <div className="absolute right-0 top-full mt-2 z-10 bg-white border border-gray-200 text-xs text-gray-600 rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
               Coming soon — triggers new run via API
             </div>
           )}
@@ -383,10 +382,10 @@ export function TestRunDetail() {
       </div>
 
       {/* Header */}
-      <div className="glass-card p-6">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
           <div>
-            <h1 className="text-xl font-bold text-white">{run.name}</h1>
+            <h1 className="text-xl font-bold text-gray-900">{run.name}</h1>
             <p className="text-sm text-gray-500 mt-1 font-mono">{run.id}</p>
           </div>
           <StatusBadge status={run.status} />
@@ -401,21 +400,21 @@ export function TestRunDetail() {
           <MetaChip icon={<Layers className="w-3.5 h-3.5" />} label="Firmware" value={run.firmware_version ?? '—'} mono />
         </div>
 
-        <div className="mt-4 pt-4 border-t border-white/5 flex flex-wrap gap-4 text-xs text-gray-500">
+        <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-xs text-gray-500">
           <span>
-            <span className="text-gray-600">Environment: </span>
-            <span className="text-gray-300 capitalize">{run.environment}</span>
+            <span className="text-gray-400">Environment: </span>
+            <span className="text-gray-700 capitalize">{run.environment}</span>
           </span>
           {run.started_at && (
             <span>
-              <span className="text-gray-600">Started: </span>
-              <span className="text-gray-300">{formatDateTime(run.started_at)}</span>
+              <span className="text-gray-400">Started: </span>
+              <span className="text-gray-700">{formatDateTime(run.started_at)}</span>
             </span>
           )}
           {run.completed_at && (
             <span>
-              <span className="text-gray-600">Completed: </span>
-              <span className="text-gray-300">{formatDateTime(run.completed_at)}</span>
+              <span className="text-gray-400">Completed: </span>
+              <span className="text-gray-700">{formatDateTime(run.completed_at)}</span>
             </span>
           )}
         </div>
@@ -427,14 +426,14 @@ export function TestRunDetail() {
         {/* Left: test results tree (3 cols) */}
         <div className="lg:col-span-3 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-white">Test Results</h2>
+            <h2 className="text-sm font-semibold text-gray-900">Test Results</h2>
             <div className="flex items-center gap-3 text-xs">
-              <span className="flex items-center gap-1 text-emerald-400">
+              <span className="flex items-center gap-1 text-emerald-600">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 {run.passed} passed
               </span>
               {run.failed > 0 && (
-                <span className="flex items-center gap-1 text-red-400">
+                <span className="flex items-center gap-1 text-red-500">
                   <XCircle className="w-3.5 h-3.5" />
                   {run.failed} failed
                 </span>
@@ -459,20 +458,20 @@ export function TestRunDetail() {
         <div className="lg:col-span-2 space-y-4">
 
           {/* Pass rate donut */}
-          <div className="glass-card p-5">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
               Run Summary
             </h3>
             <div className="flex items-center justify-between gap-4">
               <PassRateDonut passed={run.passed} total={run.total_tests} />
               <div className="space-y-2.5 flex-1">
                 <SummaryRow label="Total" value={run.total_tests.toString()} />
-                <SummaryRow label="Passed" value={run.passed.toString()} color="text-emerald-400" />
-                <SummaryRow label="Failed" value={run.failed.toString()} color={run.failed > 0 ? 'text-red-400' : 'text-gray-500'} />
+                <SummaryRow label="Passed" value={run.passed.toString()} color="text-emerald-600" />
+                <SummaryRow label="Failed" value={run.failed.toString()} color={run.failed > 0 ? 'text-red-500' : 'text-gray-500'} />
                 <SummaryRow label="Skipped" value={run.skipped.toString()} color="text-gray-500" />
                 <SummaryRow label="Duration" value={formatDuration(run.duration_ms)} />
                 {run.error_count > 0 && (
-                  <SummaryRow label="Errors" value={run.error_count.toString()} color="text-amber-400" />
+                  <SummaryRow label="Errors" value={run.error_count.toString()} color="text-amber-500" />
                 )}
               </div>
             </div>
@@ -480,8 +479,8 @@ export function TestRunDetail() {
 
           {/* Device info */}
           {run.device && (
-            <div className="glass-card p-5">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
                 Device
               </h3>
               <div className="space-y-2">
@@ -498,8 +497,8 @@ export function TestRunDetail() {
           )}
 
           {/* CI trigger */}
-          <div className="glass-card p-5">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
               CI / Trigger
             </h3>
             <div className="space-y-2">
@@ -522,31 +521,31 @@ export function TestRunDetail() {
         </div>
       </div>
 
-      {/* Associated logs — full width */}
+      {/* Associated logs */}
       {deviceLogs.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-              <Terminal className="w-4 h-4 text-gray-500" />
+            <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+              <Terminal className="w-4 h-4 text-gray-400" />
               Device Logs
             </h2>
             <Link
-              to={`/logs`}
-              className="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              to={getScopedPath('logs')}
+              className="flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-700 transition-colors"
             >
               View all logs for this device
               <ExternalLink className="w-3 h-3" />
             </Link>
           </div>
 
-          <div className="glass-card overflow-hidden">
-            <div className="bg-[#060609] font-mono divide-y divide-white/[0.03]">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-gray-50 font-mono divide-y divide-gray-100">
               {deviceLogs.map(log => (
                 <div
                   key={log.id}
-                  className="flex gap-3 px-4 py-2 hover:bg-white/[0.02] transition-colors text-xs"
+                  className="flex gap-3 px-4 py-2 hover:bg-gray-100 transition-colors text-xs"
                 >
-                  <span className="text-gray-700 flex-shrink-0 w-28 truncate">
+                  <span className="text-gray-400 flex-shrink-0 w-28 truncate">
                     {new Date(log.timestamp).toLocaleTimeString('en-US', {
                       hour12: false,
                       hour: '2-digit',
@@ -560,12 +559,12 @@ export function TestRunDetail() {
                     {log.level === 'fatal' ? 'FATL' : log.level.toUpperCase().slice(0, 4)}
                   </span>
                   {log.source && (
-                    <span className="text-blue-400/60 flex-shrink-0 w-24 truncate">
+                    <span className="text-indigo-500 flex-shrink-0 w-24 truncate">
                       [{log.source}]
                     </span>
                   )}
                   <span
-                    className={`flex-1 ${LOG_LEVEL_COLORS[log.level] ?? 'text-gray-400'} ${
+                    className={`flex-1 ${LOG_LEVEL_COLORS[log.level] ?? 'text-gray-500'} ${
                       log.level === 'debug' || log.level === 'trace' ? 'opacity-60' : ''
                     }`}
                   >
@@ -581,7 +580,7 @@ export function TestRunDetail() {
   );
 }
 
-// ─── Small helpers ─────────────────────────────────────────────────────────────
+// --- Small helpers ---
 
 function MetaChip({
   icon,
@@ -598,12 +597,12 @@ function MetaChip({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-1.5 text-gray-500 text-xs">
+      <div className="flex items-center gap-1.5 text-gray-400 text-xs">
         {icon}
         <span>{label}</span>
       </div>
       <span
-        className={`text-sm text-white truncate ${mono ? 'font-mono' : ''} ${cap ? 'capitalize' : ''}`}
+        className={`text-sm text-gray-900 truncate ${mono ? 'font-mono' : ''} ${cap ? 'capitalize' : ''}`}
       >
         {value}
       </span>
@@ -614,7 +613,7 @@ function MetaChip({
 function SummaryRow({
   label,
   value,
-  color = 'text-white',
+  color = 'text-gray-900',
 }: {
   label: string;
   value: string;
@@ -641,8 +640,8 @@ function InfoRow({
 }) {
   return (
     <div className="flex items-center gap-2 text-xs">
-      <span className="text-gray-600 flex-shrink-0">{icon}</span>
-      <span className={`text-gray-300 ${mono ? 'font-mono' : ''} ${cap ? 'capitalize' : ''}`}>
+      <span className="text-gray-400 flex-shrink-0">{icon}</span>
+      <span className={`text-gray-700 ${mono ? 'font-mono' : ''} ${cap ? 'capitalize' : ''}`}>
         {label}
       </span>
     </div>

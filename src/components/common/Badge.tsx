@@ -3,17 +3,17 @@ import { STATUS_COLORS, SEVERITY_COLORS } from '../../utils/constants';
 
 interface BadgeProps {
   children: ReactNode;
-  variant?: 'status' | 'severity' | 'default' | 'blue' | 'green' | 'purple' | 'gray';
+  variant?: 'status' | 'severity' | 'default' | 'blue' | 'green' | 'indigo' | 'gray';
   className?: string;
 }
 
 export function Badge({ children, variant = 'default', className = '' }: BadgeProps) {
   const variantClasses = {
-    default: 'text-gray-400 bg-gray-400/10 border-gray-400/20',
-    blue: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-    green: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-    purple: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
-    gray: 'text-gray-500 bg-gray-500/10 border-gray-500/20',
+    default: 'text-gray-600 bg-gray-100 border-gray-200',
+    blue: 'text-blue-600 bg-blue-50 border-blue-200',
+    green: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+    indigo: 'text-indigo-600 bg-indigo-50 border-indigo-200',
+    gray: 'text-gray-500 bg-gray-100 border-gray-200',
     status: '',
     severity: '',
   };
@@ -48,9 +48,9 @@ export function SeverityBadge({ severity }: { severity: string }) {
 
 export function PlanBadge({ plan }: { plan: string }) {
   const colors: Record<string, string> = {
-    starter: 'text-gray-400 bg-gray-400/10 border-gray-400/20',
-    professional: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-    enterprise: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
+    starter: 'text-gray-600 bg-gray-100 border-gray-200',
+    professional: 'text-blue-600 bg-blue-50 border-blue-200',
+    enterprise: 'text-indigo-600 bg-indigo-50 border-indigo-200',
   };
   return (
     <span className={`badge ${colors[plan] || colors.starter}`}>
@@ -61,7 +61,7 @@ export function PlanBadge({ plan }: { plan: string }) {
 
 export function ComingSoonBadge() {
   return (
-    <span className="badge text-amber-400 bg-amber-400/10 border-amber-400/20">
+    <span className="badge text-amber-600 bg-amber-50 border-amber-200">
       Coming soon
     </span>
   );

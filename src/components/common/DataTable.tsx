@@ -49,7 +49,7 @@ export function DataTable<T extends Record<string, unknown>>({
     <div className={`overflow-x-auto ${className}`}>
       <table className="w-full">
         <thead>
-          <tr className="border-b border-white/8">
+          <tr className="border-b border-gray-200">
             {columns.map(col => (
               <th
                 key={col.key}
@@ -81,7 +81,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 onClick={() => onRowClick?.(row)}
               >
                 {columns.map(col => (
-                  <td key={col.key} className={`table-cell text-gray-300 ${col.className || ''}`}>
+                  <td key={col.key} className={`table-cell text-gray-700 ${col.className || ''}`}>
                     {col.render ? col.render(row) : String(row[col.key] ?? '—')}
                   </td>
                 ))}

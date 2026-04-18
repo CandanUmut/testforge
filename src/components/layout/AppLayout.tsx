@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Menu, Bell, X, Search } from 'lucide-react';
 import { Sidebar } from './Sidebar';
-import { useAuth } from '../../contexts/AuthContext';
+import { useDataContext } from '../../contexts/DataContext';
 import {
   CommandPalette,
   CommandPaletteProvider,
@@ -18,13 +18,13 @@ import {
 
 function AppLayoutInner() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { isDemoMode } = useAuth();
+  const { isDemoMode } = useDataContext();
   const location = useLocation();
   const { setOpen: openPalette } = useCommandPalette();
   const { unreadCount, setOpen: openNotifications } = useNotifications();
 
   return (
-    <div className="flex h-screen bg-[#0A0A0F] overflow-hidden">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Always-present overlays (hidden until triggered) */}
       <CommandPalette />
       <NotificationCenter />
@@ -51,8 +51,8 @@ function AppLayoutInner() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Demo banner */}
         {isDemoMode && (
-          <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 flex items-center justify-between">
-            <p className="text-amber-400 text-xs">
+          <div className="bg-indigo-50 border-b border-indigo-200 px-4 py-2 flex items-center justify-between">
+            <p className="text-indigo-700 text-xs">
               <span className="font-semibold">Demo Mode</span> — You&apos;re viewing sample data.
               Connect Supabase credentials for real multi-tenant auth and data persistence.
             </p>
@@ -60,10 +60,10 @@ function AppLayoutInner() {
         )}
 
         {/* Top bar */}
-        <header className="h-14 border-b border-white/5 bg-[#0A0A0F] flex items-center justify-between px-4 flex-shrink-0">
+        <header className="h-14 border-b border-gray-200 bg-white flex items-center justify-between px-4 flex-shrink-0">
           {/* Mobile hamburger */}
           <button
-            className="lg:hidden text-gray-400 hover:text-white"
+            className="lg:hidden text-gray-500 hover:text-gray-900"
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
           >
@@ -77,8 +77,8 @@ function AppLayoutInner() {
               onClick={() => openPalette(true)}
               className="
                 hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg
-                bg-white/4 hover:bg-white/8 border border-white/8
-                text-gray-500 hover:text-gray-300
+                bg-gray-50 hover:bg-gray-100 border border-gray-200
+                text-gray-500 hover:text-gray-700
                 text-xs transition-colors
                 mr-2
               "
@@ -86,7 +86,7 @@ function AppLayoutInner() {
             >
               <Search className="w-3.5 h-3.5" />
               <span>Search</span>
-              <kbd className="ml-1 font-mono tracking-tight text-[10px] text-gray-600">⌘K</kbd>
+              <kbd className="ml-1 font-mono tracking-tight text-[10px] text-gray-400">⌘K</kbd>
             </button>
           </div>
 
@@ -95,7 +95,7 @@ function AppLayoutInner() {
             {/* Bell / notification toggle */}
             <button
               onClick={() => openNotifications(true)}
-              className="relative text-gray-400 hover:text-white transition-colors"
+              className="relative text-gray-500 hover:text-gray-900 transition-colors"
               aria-label="Open notifications"
             >
               <Bell className="w-5 h-5" />

@@ -9,6 +9,7 @@ import { demoTestRuns } from '../utils/seedData';
 import { StatusBadge } from '../components/common/Badge';
 import { formatDuration, formatDateTime, formatPassRate } from '../utils/formatters';
 import type { TestRun, TestCategory } from '../lib/types';
+import { useDataContext } from '../contexts/DataContext';
 
 // ─── Mock comparison generation ───────────────────────────────────────────────
 
@@ -123,9 +124,9 @@ function PassRateBar({ passed, total, label }: { passed: number; total: number; 
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
         <span className="text-gray-400">{label}</span>
-        <span className="text-white font-semibold">{pct}%</span>
+        <span className="text-gray-900 font-semibold">{pct}%</span>
       </div>
-      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-gray-50 rounded-full overflow-hidden">
         <div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -145,6 +146,7 @@ function StatusIcon({ status }: { status: 'passed' | 'failed' | 'skipped' }) {
 }
 
 function RunCard({ run, label }: { run: TestRun; label: 'A' | 'B' }) {
+  const { basePath } = useDataContext();
   const pct = run.total_tests > 0
     ? Math.round((run.passed / run.total_tests) * 100)
     : 0;
@@ -157,10 +159,10 @@ function RunCard({ run, label }: { run: TestRun; label: 'A' | 'B' }) {
       </div>
 
       <Link
-        to={`/test-runs/${run.id}`}
-        className="block hover:text-blue-300 transition-colors"
+        to={`${basePath}/test-runs/${run.id}`}
+        className="block hover:text-indigo-600 transition-colors"
       >
-        <h3 className="text-base font-bold text-white leading-tight hover:text-blue-300 transition-colors">
+        <h3 className="text-base font-bold text-gray-900 leading-tight hover:text-indigo-600 transition-colors">
           {run.name}
         </h3>
       </Link>
@@ -172,11 +174,11 @@ function RunCard({ run, label }: { run: TestRun; label: 'A' | 'B' }) {
         <div className="grid grid-cols-2 gap-3 pt-1">
           <div className="space-y-0.5">
             <p className="text-xs text-gray-500">Total tests</p>
-            <p className="text-sm font-semibold text-white">{run.total_tests}</p>
+            <p className="text-sm font-semibold text-gray-900">{run.total_tests}</p>
           </div>
           <div className="space-y-0.5">
             <p className="text-xs text-gray-500">Pass rate</p>
-            <p className="text-sm font-semibold text-white">{pct}%</p>
+            <p className="text-sm font-semibold text-gray-900">{pct}%</p>
           </div>
           <div className="space-y-0.5">
             <p className="text-xs text-gray-500">Failed</p>
@@ -186,11 +188,11 @@ function RunCard({ run, label }: { run: TestRun; label: 'A' | 'B' }) {
           </div>
           <div className="space-y-0.5">
             <p className="text-xs text-gray-500">Duration</p>
-            <p className="text-sm font-semibold text-white">{formatDuration(run.duration_ms)}</p>
+            <p className="text-sm font-semibold text-gray-900">{formatDuration(run.duration_ms)}</p>
           </div>
         </div>
 
-        <div className="border-t border-white/5 pt-3 space-y-1.5">
+        <div className="border-t border-gray-100 pt-3 space-y-1.5">
           {run.device && (
             <div className="flex items-center gap-2 text-xs text-gray-400">
               <Cpu className="w-3 h-3 text-gray-600 flex-shrink-0" />
@@ -224,23 +226,24 @@ function RunCard({ run, label }: { run: TestRun; label: 'A' | 'B' }) {
 // ─── Empty state ───────────────────────────────────────────────────────────────
 
 function EmptyCompare({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  const { getScopedPath } = useDataContext();
   return (
     <div className="p-6">
       <button
-        onClick={() => navigate('/test-runs')}
-        className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-8"
+        onClick={() => navigate(getScopedPath('test-runs'))}
+        className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-900 transition-colors mb-8"
       >
         <ArrowLeft className="w-4 h-4" />
         Test Runs
       </button>
       <div className="glass-card p-12 flex flex-col items-center justify-center gap-4 text-center max-w-md mx-auto">
         <BarChart2 className="w-10 h-10 text-gray-600" />
-        <p className="text-lg font-semibold text-white">Select runs to compare</p>
+        <p className="text-lg font-semibold text-gray-900">Select runs to compare</p>
         <p className="text-sm text-gray-500">
           Go back to Test Runs and select two runs using the checkboxes, then click
           "Compare 2 runs".
         </p>
-        <button onClick={() => navigate('/test-runs')} className="btn-secondary mt-2">
+        <button onClick={() => navigate(getScopedPath('test-runs'))} className="btn-secondary mt-2">
           Back to Test Runs
         </button>
       </div>
@@ -252,9 +255,9 @@ function EmptyCompare({ navigate }: { navigate: ReturnType<typeof useNavigate> }
 
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#1a1a2e] border border-white/10 rounded-xl px-4 py-3 shadow-2xl text-sm text-white animate-in">
+    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-2xl text-sm text-gray-900 animate-in">
       <span>{message}</span>
-      <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors text-xs">✕</button>
+      <button onClick={onClose} className="text-gray-500 hover:text-gray-900 transition-colors text-xs">✕</button>
     </div>
   );
 }
@@ -264,6 +267,7 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
 export function CompareRuns() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { getScopedPath } = useDataContext();
   const [toast, setToast] = useState<string | null>(null);
 
   const idA = searchParams.get('a') ?? '';
@@ -302,15 +306,15 @@ export function CompareRuns() {
       {/* Header row */}
       <div className="flex items-center justify-between">
         <button
-          onClick={() => navigate('/test-runs')}
-          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+          onClick={() => navigate(getScopedPath('test-runs'))}
+          className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-900 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Test Runs
         </button>
         <button
           onClick={handleExport}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:bg-white/8 transition-all"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-all"
         >
           <Download className="w-4 h-4" />
           Export diff as CSV
@@ -318,12 +322,12 @@ export function CompareRuns() {
       </div>
 
       <div>
-        <h1 className="text-xl font-bold text-white">Compare Runs</h1>
+        <h1 className="text-xl font-bold text-gray-900">Compare Runs</h1>
         <p className="text-sm text-gray-500 mt-1">
           Diff between{' '}
-          <span className="text-gray-300 font-mono">{runA.id}</span>
+          <span className="text-gray-700 font-mono">{runA.id}</span>
           {' '}and{' '}
-          <span className="text-gray-300 font-mono">{runB.id}</span>
+          <span className="text-gray-700 font-mono">{runB.id}</span>
         </p>
       </div>
 
@@ -334,7 +338,7 @@ export function CompareRuns() {
         {/* VS divider */}
         <div className="flex sm:flex-col items-center justify-center gap-3 py-2 sm:py-0">
           <div className="flex-1 sm:flex-none h-px sm:h-full sm:w-px bg-white/8 sm:min-h-[40px]" />
-          <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center flex-shrink-0">
             <ArrowRight className="w-3.5 h-3.5 text-gray-500" />
           </div>
           <div className="flex-1 sm:flex-none h-px sm:h-full sm:w-px bg-white/8 sm:min-h-[40px]" />
@@ -377,7 +381,7 @@ export function CompareRuns() {
 
       {/* Changes table */}
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-white">Test Status Changes</h2>
+        <h2 className="text-sm font-semibold text-gray-900">Test Status Changes</h2>
 
         {changes.length === 0 ? (
           <div className="glass-card p-10 flex flex-col items-center gap-3 text-center">
@@ -389,7 +393,7 @@ export function CompareRuns() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/8">
+                  <tr className="border-b border-gray-200">
                     <th className="table-header">Test name</th>
                     <th className="table-header hidden sm:table-cell">Category</th>
                     <th className="table-header">Run A</th>
@@ -415,7 +419,7 @@ export function CompareRuns() {
             </div>
 
             {/* Legend */}
-            <div className="border-t border-white/5 px-4 py-3 flex flex-wrap gap-4 text-xs text-gray-500">
+            <div className="border-t border-gray-100 px-4 py-3 flex flex-wrap gap-4 text-xs text-gray-500">
               <span className="flex items-center gap-1.5">
                 <TrendingDown className="w-3 h-3 text-red-400" />
                 Regression (pass → fail)
@@ -455,7 +459,7 @@ function ChangeRow({ change }: { change: ChangedTest }) {
   return (
     <tr className="table-row">
       <td className="table-cell">
-        <span className="text-xs font-mono text-gray-300">{change.test_name}</span>
+        <span className="text-xs font-mono text-gray-700">{change.test_name}</span>
       </td>
       <td className="table-cell hidden sm:table-cell">
         <span className="text-xs text-gray-500 capitalize">{change.category}</span>

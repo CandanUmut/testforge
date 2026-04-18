@@ -7,11 +7,13 @@ import { EmptyState } from '../components/common/EmptyState';
 import { formatRelativeTime, formatDuration, formatPassRate } from '../utils/formatters';
 import { PlayCircle, Filter, Cpu, GitBranch, ArrowRight, GitCompare } from 'lucide-react';
 import type { RunStatus } from '../lib/types';
+import { useDataContext } from '../contexts/DataContext';
 
 const statusOptions: (RunStatus | 'all')[] = ['all', 'passed', 'failed', 'error', 'running', 'timeout'];
 
 export function TestRuns() {
   const navigate = useNavigate();
+  const { basePath } = useDataContext();
   const [statusFilter, setStatusFilter] = useState<RunStatus | 'all'>('all');
   const [selected, setSelected] = useState<string[]>([]);
   const { runs, loading } = useTestRuns();
@@ -32,12 +34,12 @@ export function TestRuns() {
   }
 
   function handleRowClick(id: string) {
-    navigate(`/test-runs/${id}`);
+    navigate(`${basePath}/test-runs/${id}`);
   }
 
   function handleCompare() {
     if (selected.length === 2) {
-      navigate(`/test-runs/compare?a=${selected[0]}&b=${selected[1]}`);
+      navigate(`${basePath}/test-runs/compare?a=${selected[0]}&b=${selected[1]}`);
     }
   }
 
@@ -47,19 +49,19 @@ export function TestRuns() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Test Runs</h1>
-          <p className="text-sm text-gray-400 mt-1">{runs.length} total runs</p>
+          <h1 className="text-xl font-bold text-gray-900">Test Runs</h1>
+          <p className="text-sm text-gray-500 mt-1">{runs.length} total runs</p>
         </div>
 
-        {/* Compare button — only shows when runs are selected */}
+        {/* Compare button */}
         {selected.length > 0 && (
           <button
             onClick={handleCompare}
             disabled={!canCompare}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
               canCompare
-                ? 'bg-blue-500/15 border-blue-500/30 text-blue-400 hover:bg-blue-500/25 hover:border-blue-500/50 cursor-pointer'
-                : 'bg-white/5 border-white/10 text-gray-500 cursor-not-allowed'
+                ? 'bg-indigo-50 border-indigo-200 text-indigo-600 hover:bg-indigo-100 cursor-pointer'
+                : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
             }`}
           >
             <GitCompare className="w-4 h-4" />
@@ -69,8 +71,8 @@ export function TestRuns() {
       </div>
 
       {/* Filters */}
-      <div className="glass-card p-4 flex flex-wrap items-center gap-3">
-        <Filter className="w-4 h-4 text-gray-500" />
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex flex-wrap items-center gap-3">
+        <Filter className="w-4 h-4 text-gray-400" />
         <div className="flex flex-wrap gap-2">
           {statusOptions.map(s => (
             <button
@@ -78,8 +80,8 @@ export function TestRuns() {
               onClick={() => setStatusFilter(s)}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${
                 statusFilter === s
-                  ? 'bg-blue-500/20 border-blue-500/40 text-blue-400'
-                  : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20'
+                  ? 'bg-indigo-50 border-indigo-200 text-indigo-600'
+                  : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -97,7 +99,7 @@ export function TestRuns() {
       )}
 
       {/* Table */}
-      <div className="glass-card overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <LoadingSpinner />
@@ -112,7 +114,7 @@ export function TestRuns() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/8">
+                <tr className="border-b border-gray-200">
                   {/* Checkbox column */}
                   <th className="table-header w-10" />
                   <th className="table-header">Test Suite</th>
@@ -133,7 +135,7 @@ export function TestRuns() {
                   return (
                     <tr
                       key={run.id}
-                      className={`table-row ${isChecked ? 'bg-blue-500/5' : ''}`}
+                      className={`table-row ${isChecked ? 'bg-indigo-50/50' : ''}`}
                     >
                       {/* Checkbox */}
                       <td
@@ -144,19 +146,19 @@ export function TestRuns() {
                           type="checkbox"
                           checked={isChecked}
                           onChange={e => handleCheck(run.id, e.target.checked)}
-                          className="w-4 h-4 rounded border border-white/20 bg-white/5 accent-blue-500 cursor-pointer"
+                          className="w-4 h-4 rounded border border-gray-300 bg-white accent-indigo-600 cursor-pointer"
                           aria-label={`Select run ${run.id}`}
                         />
                       </td>
 
-                      {/* Test Suite — click to navigate */}
+                      {/* Test Suite */}
                       <td
                         className="table-cell cursor-pointer"
                         onClick={() => handleRowClick(run.id)}
                       >
                         <div>
-                          <p className="text-sm text-white font-medium">{run.name}</p>
-                          <p className="text-xs text-gray-600 mt-0.5 capitalize">
+                          <p className="text-sm text-gray-900 font-medium">{run.name}</p>
+                          <p className="text-xs text-gray-500 mt-0.5 capitalize">
                             {run.trigger_type.replace('_', ' ')}
                           </p>
                         </div>
@@ -166,7 +168,7 @@ export function TestRuns() {
                         className="table-cell hidden md:table-cell cursor-pointer"
                         onClick={() => handleRowClick(run.id)}
                       >
-                        <div className="flex items-center gap-1.5 text-gray-400 text-xs">
+                        <div className="flex items-center gap-1.5 text-gray-500 text-xs">
                           <Cpu className="w-3 h-3" />
                           <span className="truncate max-w-[100px]">{run.device?.name || '—'}</span>
                         </div>
@@ -176,7 +178,7 @@ export function TestRuns() {
                         className="table-cell hidden sm:table-cell cursor-pointer"
                         onClick={() => handleRowClick(run.id)}
                       >
-                        <div className="flex items-center gap-1.5 text-gray-400 text-xs">
+                        <div className="flex items-center gap-1.5 text-gray-500 text-xs">
                           <GitBranch className="w-3 h-3" />
                           <span className="truncate max-w-[80px]">{run.branch || 'main'}</span>
                         </div>
@@ -194,8 +196,8 @@ export function TestRuns() {
                         onClick={() => handleRowClick(run.id)}
                       >
                         <div>
-                          <p className="text-sm text-white">{formatPassRate(run.passed, run.total_tests)}</p>
-                          <p className="text-xs text-gray-600">{run.passed}/{run.total_tests}</p>
+                          <p className="text-sm text-gray-900">{formatPassRate(run.passed, run.total_tests)}</p>
+                          <p className="text-xs text-gray-500">{run.passed}/{run.total_tests}</p>
                         </div>
                       </td>
 
@@ -207,7 +209,7 @@ export function TestRuns() {
                       </td>
 
                       <td
-                        className="table-cell hidden lg:table-cell text-gray-400 text-xs cursor-pointer"
+                        className="table-cell hidden lg:table-cell text-gray-500 text-xs cursor-pointer"
                         onClick={() => handleRowClick(run.id)}
                       >
                         {formatDuration(run.duration_ms)}
@@ -227,7 +229,7 @@ export function TestRuns() {
                       >
                         <button
                           onClick={() => handleRowClick(run.id)}
-                          className="p-1.5 rounded-md text-gray-600 hover:text-blue-400 hover:bg-blue-400/10 transition-all"
+                          className="p-1.5 rounded-md text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
                           aria-label={`View details for ${run.name}`}
                           title="View details"
                         >

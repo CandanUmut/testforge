@@ -32,7 +32,7 @@ export interface Profile {
 // ─── Devices ─────────────────────────────────────────────────────────────────
 
 export type DeviceType = 'android' | 'ios' | 'embedded' | 'iot' | 'web' | 'desktop' | 'custom';
-export type DeviceStatus = 'online' | 'offline' | 'testing' | 'error' | 'maintenance';
+export type DeviceStatus = 'online' | 'offline' | 'testing' | 'error' | 'maintenance' | 'flashing';
 export type ConnectionType = 'usb' | 'adb' | 'uart' | 'ssh' | 'wifi' | 'api' | 'agent';
 
 export interface Device {
@@ -45,6 +45,8 @@ export interface Device {
   os_version?: string;
   status: DeviceStatus;
   connection_type?: ConnectionType;
+  battery_level?: number;
+  carrier?: string;
   metadata: Record<string, unknown>;
   last_seen_at?: string;
   created_at: string;
@@ -108,7 +110,7 @@ export interface TestResult {
 
 // ─── Crashes ─────────────────────────────────────────────────────────────────
 
-export type CrashType = 'kernel_panic' | 'anr' | 'native_crash' | 'java_exception' | 'segfault' | 'watchdog' | 'oom' | 'assertion' | 'timeout' | 'power_failure' | 'unknown';
+export type CrashType = 'kernel_panic' | 'anr' | 'native_crash' | 'java_exception' | 'segfault' | 'watchdog' | 'oom' | 'assertion' | 'timeout' | 'power_failure' | 'modem' | 'unknown';
 export type Severity = 'critical' | 'high' | 'medium' | 'low';
 export type CrashStatus = 'new' | 'investigating' | 'identified' | 'fixed' | 'wont_fix' | 'duplicate';
 
@@ -130,7 +132,10 @@ export interface Crash {
   ai_analysis?: string;
   ai_suggested_fix?: string;
   assigned_to?: string;
+  assigned_team?: string;
+  affected_devices?: string[];
   fingerprint?: string;
+  jira_ticket?: string;
   metadata: Record<string, unknown>;
   created_at: string;
   // joined

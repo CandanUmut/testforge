@@ -1,63 +1,53 @@
-import { AlertTriangle, CheckCircle } from 'lucide-react';
+import { Bot, Boxes, ClipboardList, Siren } from 'lucide-react';
 
 const painPoints = [
   {
-    pain: 'Your test infrastructure was built by whoever had time, and now nobody understands it.',
-    fix: 'TestForge gives you a clean, documented platform that any engineer can operate.',
+    title: 'AI ships code. Who tests it?',
+    copy: 'AI-assisted development means more PRs, more builds, and more features shipped faster than your test team can validate. Every untested build compounds risk.',
+    icon: Bot,
   },
   {
-    pain: 'Crash logs sit in a shared drive. Triage happens in someone\'s head.',
-    fix: 'AI-powered crash triage groups failures by fingerprint and suggests root causes automatically.',
+    title: 'Tracking devices in a spreadsheet',
+    copy: 'You have 200 devices in the lab. Half are in drawers, some are flashed with old firmware, and nobody knows which ones are available right now.',
+    icon: Boxes,
   },
   {
-    pain: 'You find out about regressions when QA emails you on Friday afternoon.',
-    fix: 'Real-time alerts and automated reporting surface failures the moment they happen.',
+    title: 'Manual crash triage every Monday',
+    copy: 'Someone spends half the week reading crash logs, deduplicating failures, and filing Jira tickets by hand. Every week. For every build.',
+    icon: ClipboardList,
   },
   {
-    pain: 'Every new device type means rebuilding your test pipeline from scratch.',
-    fix: 'Universal device support. Connect any device — Android, IoT, embedded, web — through a single platform.',
+    title: 'No visibility until it is too late',
+    copy: 'You find out a device has been offline for 3 days when a test run fails. You discover a regression after 50 builds have shipped.',
+    icon: Siren,
   },
 ];
 
 export function PainPoints() {
   return (
-    <section className="py-24 px-4 sm:px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="text-sm font-semibold text-blue-400 uppercase tracking-widest mb-4">
-            Sound familiar?
-          </p>
-          <h2 className="section-title mb-4">
-            The test automation tax is{' '}
-            <span className="text-gradient-blue">real.</span>
+    <section id="pain-points" className="px-4 py-24 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="max-w-3xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-indigo-600">Sound familiar?</p>
+          <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-slate-950">
+            The lab still runs on spreadsheets, Slack messages, and tribal knowledge.
           </h2>
-          <p className="section-subtitle">
-            Hardware teams spend 30–50% of engineering time maintaining test infrastructure instead of building products. We built TestForge to fix that.
-          </p>
         </div>
-
-        <div className="grid md:grid-cols-2 gap-5">
-          {painPoints.map((item, i) => (
-            <div key={i} className="glass-card p-6 group hover:border-white/15 transition-all duration-300">
-              <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center mt-0.5">
-                  <AlertTriangle className="w-4 h-4 text-red-400" />
-                </div>
-                <div>
-                  <p className="text-gray-300 leading-relaxed mb-4">
-                    "{item.pain}"
-                  </p>
-                  <div className="flex items-start gap-2 pt-4 border-t border-white/5">
-                    <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-emerald-400 text-sm leading-relaxed">
-                      {item.fix}
-                    </p>
-                  </div>
-                </div>
+        <div className="mt-12 grid gap-6 md:grid-cols-2">
+          {painPoints.map(({ copy, icon: Icon, title }) => (
+            <div key={title} className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                <Icon className="h-5 w-5" />
               </div>
+              <h3 className="mt-6 text-2xl font-semibold tracking-[-0.03em] text-slate-950">{title}</h3>
+              <p className="mt-4 text-sm leading-7 text-slate-600">{copy}</p>
             </div>
           ))}
         </div>
+        <p className="mx-auto mt-10 max-w-3xl text-center text-sm leading-7 text-slate-500">
+          TestForge was built by a test automation engineer who lived these problems for 6 years.
+          It exists because none of the existing tools solved them cleanly.
+        </p>
       </div>
     </section>
   );

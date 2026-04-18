@@ -1,35 +1,41 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { CrashList } from '../components/triage/CrashList';
 import { CrashDetail } from '../components/triage/CrashDetail';
 import { TriageActions } from '../components/triage/TriageActions';
 import { EmptyState } from '../components/common/EmptyState';
-import { demoCrashes } from '../utils/seedData';
-import type { Crash } from '../lib/types';
-import { Bug, Filter } from 'lucide-react';
+import { useCrashes } from '../hooks/useCrashes';
+import type { Crash, CrashStatus } from '../lib/types';
+import { Bug } from 'lucide-react';
 
 type SeverityFilter = 'all' | 'critical' | 'high' | 'medium' | 'low';
 type StatusFilter = 'all' | 'open' | 'fixed';
 
 export function CrashTriage() {
-  const [selected, setSelected] = useState<Crash | null>(demoCrashes[0] || null);
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('open');
 
-  const crashes = demoCrashes.filter(crash => {
-    if (severityFilter !== 'all' && crash.severity !== severityFilter) return false;
-    if (statusFilter === 'open' && ['fixed', 'wont_fix', 'duplicate'].includes(crash.status)) return false;
-    if (statusFilter === 'fixed' && !['fixed', 'wont_fix', 'duplicate'].includes(crash.status)) return false;
-    return true;
+  const { crashes } = useCrashes({
+    severity: severityFilter === 'all' ? undefined : severityFilter,
+    status: statusFilter,
   });
+
+  const [selected, setSelected] = useState<Crash | null>(crashes[0] || null);
+
+  // Handle status change for crash triage actions (local state update)
+  const handleStatusChange = useCallback((newStatus: CrashStatus) => {
+    if (selected) {
+      setSelected({ ...selected, status: newStatus });
+    }
+  }, [selected]);
 
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-white/5 flex-shrink-0">
+      <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0 bg-white">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-xl font-bold text-white">Crash Triage</h1>
-            <p className="text-sm text-gray-400 mt-0.5">{crashes.length} crashes · AI analysis enabled</p>
+            <h1 className="text-xl font-bold text-gray-900">Crash Triage</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{crashes.length} crashes &middot; AI analysis enabled</p>
           </div>
         </div>
 
@@ -43,8 +49,8 @@ export function CrashTriage() {
                 onClick={() => setStatusFilter(s)}
                 className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
                   statusFilter === s
-                    ? 'bg-blue-500/20 border-blue-500/40 text-blue-400'
-                    : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-600'
+                    : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -59,8 +65,8 @@ export function CrashTriage() {
                 onClick={() => setSeverityFilter(s)}
                 className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
                   severityFilter === s
-                    ? 'bg-blue-500/20 border-blue-500/40 text-blue-400'
-                    : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-600'
+                    : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -81,7 +87,7 @@ export function CrashTriage() {
         ) : (
           <div className="grid lg:grid-cols-12 h-full">
             {/* Crash list */}
-            <div className="lg:col-span-4 border-r border-white/5 overflow-y-auto">
+            <div className="lg:col-span-4 border-r border-gray-200 overflow-y-auto">
               <CrashList
                 crashes={crashes}
                 selectedId={selected?.id || null}
@@ -92,11 +98,11 @@ export function CrashTriage() {
             {/* Detail + actions */}
             {selected ? (
               <>
-                <div className="lg:col-span-5 overflow-y-auto p-4 border-r border-white/5">
+                <div className="lg:col-span-5 overflow-y-auto p-4 border-r border-gray-200">
                   <CrashDetail crash={selected} />
                 </div>
                 <div className="lg:col-span-3 overflow-y-auto p-4">
-                  <TriageActions crash={selected} />
+                  <TriageActions crash={selected} onStatusChange={handleStatusChange} />
                 </div>
               </>
             ) : (

@@ -12,28 +12,28 @@ interface CrashListProps {
 
 export function CrashList({ crashes, selectedId, onSelect }: CrashListProps) {
   return (
-    <div className="glass-card overflow-hidden h-full flex flex-col">
-      <div className="px-4 py-4 border-b border-white/5">
-        <h3 className="text-sm font-semibold text-white">Crash Reports</h3>
+    <div className="bg-white overflow-hidden h-full flex flex-col">
+      <div className="px-4 py-4 border-b border-gray-200">
+        <h3 className="text-sm font-semibold text-gray-900">Crash Reports</h3>
         <p className="text-xs text-gray-500 mt-0.5">{crashes.length} total · {crashes.filter(c => c.status === 'new').length} new</p>
       </div>
-      <div className="overflow-y-auto flex-1 divide-y divide-white/5">
+      <div className="overflow-y-auto flex-1 divide-y divide-gray-100">
         {crashes.map(crash => (
           <button
             key={crash.id}
             onClick={() => onSelect(crash)}
-            className={`w-full text-left px-4 py-4 hover:bg-white/5 transition-colors ${selectedId === crash.id ? 'bg-blue-500/5 border-r-2 border-blue-500' : ''}`}
+            className={`w-full text-left px-4 py-4 hover:bg-gray-50 transition-colors ${selectedId === crash.id ? 'bg-indigo-50 border-r-2 border-indigo-500' : ''}`}
           >
             <div className="flex items-start justify-between gap-2 mb-2">
-              <p className="text-sm text-white font-medium leading-tight line-clamp-2">{crash.title}</p>
+              <p className="text-sm text-gray-900 font-medium leading-tight line-clamp-2">{crash.title}</p>
               {!['fixed', 'wont_fix', 'duplicate'].includes(crash.status) && (
-                <span className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0 mt-1.5" />
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0 mt-1.5" />
               )}
             </div>
 
             <div className="flex flex-wrap gap-1.5 mb-2">
               <SeverityBadge severity={crash.severity} />
-              <span className="badge text-gray-400 bg-gray-400/10 border-gray-400/20">
+              <span className="badge text-gray-500 bg-gray-100 border-gray-200">
                 {CRASH_TYPE_LABELS[crash.crash_type] || crash.crash_type}
               </span>
             </div>
@@ -54,8 +54,8 @@ export function CrashList({ crashes, selectedId, onSelect }: CrashListProps) {
 
             {crash.ai_analysis && (
               <div className="flex items-center gap-1 mt-2">
-                <Brain className="w-3 h-3 text-purple-400" />
-                <span className="text-[10px] text-purple-400">AI analysis available</span>
+                <Brain className="w-3 h-3 text-indigo-500" />
+                <span className="text-[10px] text-indigo-500">AI analysis available</span>
               </div>
             )}
           </button>

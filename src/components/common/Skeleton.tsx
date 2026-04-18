@@ -9,7 +9,7 @@ interface SkeletonProps {
 export function Skeleton({ className = '', style }: SkeletonProps) {
   return (
     <div
-      className={`bg-white/5 animate-pulse rounded ${className}`}
+      className={`bg-gray-200 animate-pulse rounded ${className}`}
       style={style}
       aria-hidden="true"
     />
@@ -48,7 +48,7 @@ export function SkeletonTable() {
       {heights.map((h, i) => (
         <div
           key={i}
-          className="flex items-center gap-3 px-4 py-3 border-b border-white/5"
+          className="flex items-center gap-3 px-4 py-3 border-b border-gray-100"
         >
           <Skeleton className={`${h} w-32`} />
           <Skeleton className={`${h} w-20 ml-auto`} />
@@ -108,7 +108,7 @@ export function SkeletonChart() {
 // Legacy / convenience exports
 export function SkeletonRow() {
   return (
-    <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5" aria-hidden="true">
+    <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100" aria-hidden="true">
       <Skeleton className="h-4 w-32" />
       <Skeleton className="h-4 w-24 ml-auto" />
       <Skeleton className="h-5 w-14 rounded-full" />

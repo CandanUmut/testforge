@@ -38,28 +38,28 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   const rate   = total > 0 ? Math.round((passed / total) * 100) : 0;
 
   return (
-    <div className="glass-card px-3 py-2.5 text-xs shadow-xl border border-white/10 min-w-[140px]">
-      <p className="text-gray-400 font-medium mb-2">{label}</p>
+    <div className="bg-white rounded-xl border border-gray-200 shadow-lg px-3 py-2.5 text-xs min-w-[140px]">
+      <p className="text-gray-500 font-medium mb-2">{label}</p>
       <div className="space-y-1">
         <div className="flex items-center justify-between gap-4">
-          <span className="flex items-center gap-1.5 text-emerald-400">
+          <span className="flex items-center gap-1.5 text-emerald-600">
             <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
             Passed
           </span>
-          <span className="text-white tabular-nums font-semibold">{passed.toLocaleString()}</span>
+          <span className="text-gray-900 tabular-nums font-semibold">{passed.toLocaleString()}</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="flex items-center gap-1.5 text-red-400">
-            <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+          <span className="flex items-center gap-1.5 text-red-500">
+            <span className="w-2 h-2 rounded-full bg-red-400 inline-block" />
             Failed
           </span>
-          <span className="text-white tabular-nums font-semibold">{failed.toLocaleString()}</span>
+          <span className="text-gray-900 tabular-nums font-semibold">{failed.toLocaleString()}</span>
         </div>
-        <div className="flex items-center justify-between gap-4 pt-1.5 mt-1 border-t border-white/10">
-          <span className="text-gray-400">Pass rate</span>
+        <div className="flex items-center justify-between gap-4 pt-1.5 mt-1 border-t border-gray-100">
+          <span className="text-gray-500">Pass rate</span>
           <span
             className={`tabular-nums font-bold ${
-              rate >= 95 ? 'text-emerald-400' : rate >= 80 ? 'text-amber-400' : 'text-red-400'
+              rate >= 95 ? 'text-emerald-600' : rate >= 80 ? 'text-amber-500' : 'text-red-500'
             }`}
           >
             {rate}%
@@ -92,11 +92,11 @@ export function PassFailChart({ data, loading }: PassFailChartProps) {
   const rangeLabel = `Last ${rangeDays} days`;
 
   return (
-    <div className="glass-card p-6 h-80">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 h-80">
       {/* Header */}
       <div className="flex items-start justify-between mb-5">
         <div>
-          <h3 className="text-sm font-semibold text-white">Pass/Fail Trend</h3>
+          <h3 className="text-sm font-semibold text-gray-900">Pass/Fail Trend</h3>
           <p className="text-xs text-gray-500 mt-0.5">{rangeLabel}</p>
         </div>
 
@@ -106,16 +106,16 @@ export function PassFailChart({ data, loading }: PassFailChartProps) {
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-full bg-emerald-500" />
-              <span className="text-gray-400">Passed</span>
+              <span className="text-gray-500">Passed</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-red-500" />
-              <span className="text-gray-400">Failed</span>
+              <span className="w-3 h-3 rounded-full bg-red-400" />
+              <span className="text-gray-500">Failed</span>
             </div>
           </div>
 
           {/* Time range selector pills */}
-          <div className="flex items-center gap-1 bg-white/5 border border-white/8 rounded-lg p-0.5">
+          <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-lg p-0.5">
             {TIME_RANGE_OPTIONS.map(opt => (
               <button
                 key={opt.value}
@@ -123,8 +123,8 @@ export function PassFailChart({ data, loading }: PassFailChartProps) {
                 onClick={() => setSelectedRange(opt.value)}
                 className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
                   selectedRange === opt.value
-                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                    : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                    ? 'bg-indigo-50 text-indigo-600 border border-indigo-200'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 {opt.label}
@@ -152,7 +152,7 @@ export function PassFailChart({ data, loading }: PassFailChartProps) {
               </linearGradient>
             </defs>
 
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
 
             <XAxis
               dataKey="date"
