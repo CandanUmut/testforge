@@ -39,6 +39,8 @@ npm run deploy    # build + push to GitHub Pages
 
 Without Supabase credentials the app runs in **Demo Mode** using in-memory seed data.
 
+
+
 ## Project Structure
 
 ```
