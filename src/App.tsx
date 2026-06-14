@@ -12,6 +12,7 @@ import { Landing } from './pages/Landing';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { NotFound } from './pages/NotFound';
+import { Trust } from './pages/Trust';
 
 // Lazy load dashboard pages
 const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
@@ -36,6 +37,7 @@ export function App() {
         <Routes>
           {/* Public */}
           <Route path={PUBLIC_ROUTES.landing} element={<Landing />} />
+          <Route path={PUBLIC_ROUTES.trust} element={<Trust />} />
           <Route path={PUBLIC_ROUTES.login} element={<Login />} />
           <Route path={PUBLIC_ROUTES.signup} element={<Signup />} />
           <Route

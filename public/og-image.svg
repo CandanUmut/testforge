@@ -1,0 +1,83 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glowL" cx="12%" cy="0%" r="55%">
+      <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#4f46e5" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowR" cx="100%" cy="0%" r="45%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <style>
+      .sans { font-family: 'Liberation Sans','DejaVu Sans',sans-serif; }
+      .mono { font-family: 'DejaVu Sans Mono',monospace; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <rect width="1200" height="630" fill="url(#glowL)"/>
+  <rect width="1200" height="630" fill="url(#glowR)"/>
+  <rect x="8" y="8" width="1184" height="614" rx="28" fill="none" stroke="#e2e8f0" stroke-width="2"/>
+
+  <!-- Logo -->
+  <g transform="translate(72,68)">
+    <rect width="56" height="56" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+    <path d="M31 13 L19 31 L29 31 L25 45 L39 25 L29 25 Z" fill="#4f46e5"/>
+    <text x="74" y="38" class="sans" font-size="30" font-weight="700" fill="#020617">Test<tspan fill="#4f46e5">Forge</tspan></text>
+  </g>
+
+  <!-- Eyebrow chip -->
+  <g transform="translate(72,176)">
+    <rect width="486" height="40" rx="20" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1"/>
+    <text x="22" y="26" class="sans" font-size="16" font-weight="600" letter-spacing="2" fill="#4f46e5">TEST LAB OPERATIONS &amp; OBSERVABILITY</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="70" y="320" class="sans" font-size="78" font-weight="700" letter-spacing="-3" fill="#020617">Mission control</text>
+  <text x="70" y="406" class="sans" font-size="78" font-weight="700" letter-spacing="-3" fill="#020617">for your test lab.</text>
+
+  <!-- Subhead -->
+  <text x="72" y="476" class="sans" font-size="26" fill="#475569">Device health, test orchestration, and agentic crash triage</text>
+  <text x="72" y="512" class="sans" font-size="26" fill="#475569">in one real-time control plane.</text>
+
+  <!-- Bottom trust strip -->
+  <g transform="translate(72,556)">
+    <circle cx="6" cy="-6" r="6" fill="#10b981"/>
+    <text x="22" y="0" class="sans" font-size="20" font-weight="600" fill="#334155">Your devices, your data</text>
+    <circle cx="306" cy="-6" r="6" fill="#4f46e5"/>
+    <text x="322" y="0" class="sans" font-size="20" font-weight="600" fill="#334155">Framework-agnostic</text>
+    <circle cx="566" cy="-6" r="6" fill="#f59e0b"/>
+    <text x="582" y="0" class="sans" font-size="20" font-weight="600" fill="#334155">Built by a test engineer</text>
+  </g>
+
+  <!-- Terminal card -->
+  <g transform="translate(792,150)">
+    <rect width="336" height="330" rx="18" fill="url(#card)" stroke="#e2e8f0" stroke-width="2"/>
+    <rect width="336" height="44" rx="18" fill="#f8fafc"/>
+    <rect y="22" width="336" height="22" fill="#f8fafc"/>
+    <circle cx="26" cy="22" r="6" fill="#ff5f57"/>
+    <circle cx="48" cy="22" r="6" fill="#febc2e"/>
+    <circle cx="70" cy="22" r="6" fill="#28c840"/>
+    <text x="96" y="27" class="mono" font-size="13" fill="#94a3b8">testforge-agent</text>
+    <line x1="0" y1="44" x2="336" y2="44" stroke="#e2e8f0" stroke-width="2"/>
+
+    <text x="22" y="82" class="mono" font-size="14" fill="#2563eb">scanning lab network...</text>
+    <text x="22" y="110" class="mono" font-size="14" fill="#334155">44 online  3 offline</text>
+    <text x="22" y="138" class="mono" font-size="14" fill="#059669">DUT-A001: 24/24 passed</text>
+    <text x="22" y="166" class="mono" font-size="14" fill="#dc2626">DUT-A002: 1 failed</text>
+    <text x="22" y="194" class="mono" font-size="13" fill="#dc2626">  KernelPanic @ power.c:847</text>
+    <text x="22" y="222" class="mono" font-size="14" fill="#d97706">crash auto-triaged</text>
+    <text x="22" y="250" class="mono" font-size="14" fill="#d97706">ticket FWVAL-1892 created</text>
+    <text x="22" y="278" class="mono" font-size="14" fill="#059669">43/44 devices passed</text>
+
+    <line x1="0" y1="296" x2="336" y2="296" stroke="#e2e8f0" stroke-width="2"/>
+    <text x="22" y="318" class="mono" font-size="12" fill="#94a3b8">47 devices</text>
+    <text x="150" y="318" class="mono" font-size="12" fill="#94a3b8">89% pass</text>
+    <text x="252" y="318" class="mono" font-size="12" fill="#94a3b8">4 crashes</text>
+  </g>
+</svg>

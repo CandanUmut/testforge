@@ -41,6 +41,7 @@ export function Footer({ onSelectSection }: FooterProps) {
             <div className="mt-4 space-y-3 text-sm text-slate-600">
               <Link to={PUBLIC_ROUTES.setupGuide} className="block transition hover:text-slate-950">Setup Guide</Link>
               <Link to={PUBLIC_ROUTES.apiDocs} className="block transition hover:text-slate-950">API Docs</Link>
+              <Link to={PUBLIC_ROUTES.trust} className="block transition hover:text-slate-950">Trust &amp; Security</Link>
               <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="block transition hover:text-slate-950">GitHub</a>
             </div>
           </div>

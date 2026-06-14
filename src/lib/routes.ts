@@ -15,6 +15,7 @@ export const PUBLIC_ROUTES = {
   signup: '/signup',
   setupGuide: '/docs/setup',
   apiDocs: '/docs/api',
+  trust: '/trust',
 } as const;
 
 export const DEFAULT_APP_SECTION: AppSection = 'dashboard';
