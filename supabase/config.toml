@@ -1,0 +1,8 @@
+# Supabase project configuration.
+# See https://supabase.com/docs/guides/cli/config
+
+# The ingestion gateway authenticates external `tf_` API keys itself, so the
+# platform JWT check must be disabled for it. All other functions keep the
+# default (verify_jwt = true).
+[functions.ingest]
+verify_jwt = false
