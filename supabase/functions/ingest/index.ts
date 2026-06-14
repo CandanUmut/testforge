@@ -46,6 +46,11 @@ async function sha256Hex(input: string): Promise<string> {
 const RUN_STATUSES = ['pending', 'running', 'passed', 'failed', 'error', 'cancelled', 'timeout']
 const RESULT_STATUSES = ['passed', 'failed', 'error', 'skipped', 'flaky', 'timeout']
 
+// Abuse / DoS guards. A single upload should never exceed these.
+const MAX_BODY_BYTES = 2_000_000 // ~2 MB
+const MAX_RESULTS = 5000
+const MAX_CRASHES = 1000
+
 function normalizeRunStatus(status: string | undefined): string {
   const s = (status || '').toLowerCase()
   if (s === 'completed' || s === 'success' || s === 'pass') return 'passed'
@@ -128,12 +133,19 @@ Deno.serve(async (req) => {
   // Fire-and-forget: record usage.
   supabase.from('api_keys').update({ last_used_at: new Date().toISOString() }).eq('id', key.id)
 
-  // --- 2. Parse payload ----------------------------------------------------
+  // --- 2. Parse payload (with a hard size cap) ----------------------------
+  const raw = await req.text()
+  if (raw.length > MAX_BODY_BYTES) {
+    return json({ error: `Payload too large (max ${MAX_BODY_BYTES} bytes).` }, 413)
+  }
   let body: Record<string, unknown>
   try {
-    body = await req.json()
+    body = JSON.parse(raw || '{}')
   } catch {
     return json({ error: 'Invalid JSON body.' }, 400)
+  }
+  if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+    return json({ error: 'Body must be a JSON object.' }, 400)
   }
 
   const now = new Date().toISOString()
@@ -229,6 +241,7 @@ Deno.serve(async (req) => {
     const results = body.results as Record<string, unknown>[] | undefined
     if (Array.isArray(results) && results.length) {
       if (!runId) return json({ error: 'results require a run section to attach to.' }, 400)
+      if (results.length > MAX_RESULTS) return json({ error: `Too many results (max ${MAX_RESULTS}).` }, 413)
       const rows = results.map((r) => ({
         test_run_id: runId,
         organization_id: orgId,
@@ -248,6 +261,7 @@ Deno.serve(async (req) => {
     // --- 3d. Crashes (with fingerprint-based dedup) ------------------------
     const crashes = body.crashes as Record<string, unknown>[] | undefined
     if (Array.isArray(crashes) && crashes.length) {
+      if (crashes.length > MAX_CRASHES) return json({ error: `Too many crashes (max ${MAX_CRASHES}).` }, 413)
       for (const c of crashes) {
         const message = (c.error_message as string) || (c.title as string) || 'Unknown crash'
         const trace = (c.stack_trace as string) || ''

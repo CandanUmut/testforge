@@ -36,10 +36,23 @@ npm run deploy    # build + push to GitHub Pages
 ## Supabase Setup
 
 1. Create a project at [supabase.com](https://supabase.com)
-2. Run migrations in order: `supabase/migrations/001_*.sql` → `011_*.sql`
-3. Copy `.env.example` to `.env.local` and fill in credentials
+2. Run migrations in order: `supabase/migrations/001_*.sql` → `014_*.sql`
+3. Deploy the ingestion gateway: `supabase functions deploy ingest --no-verify-jwt`
+4. Copy `.env.example` to `.env.local` and fill in credentials
 
 Without Supabase credentials the app runs in **Demo Mode** using in-memory seed data.
+
+## Security & data protection
+
+Built for teams working on unreleased hardware under NDA:
+
+- **Tenant isolation** at the database layer via PostgreSQL Row Level Security.
+- **Ingestion gateway** resolves the organization server-side, so cross-tenant writes are structurally impossible.
+- **API keys** stored only as SHA-256 hashes, shown once, scoped, expirable, revocable, and never readable over the data API.
+- **Audit trail** for key lifecycle events; **payload/batch limits** on ingestion.
+- **No data resale, no external model training**; export anytime, deletion on request; **on-premise** option.
+
+See [`SECURITY.md`](./SECURITY.md) and the in-app **Trust & Security** page (`/trust`) for details.
 
 
 
@@ -54,7 +67,8 @@ src/
 ├── components/    landing/, dashboard/, triage/, layout/, common/
 └── utils/         Seed data, formatters, constants
 supabase/
-└── migrations/    11 production-ready SQL migrations with RLS
+├── migrations/    SQL migrations with RLS + security hardening (001–014)
+└── functions/     Edge functions (ingest gateway, crash-dedup, integrations)
 ```
 
 ---

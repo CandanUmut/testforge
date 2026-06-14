@@ -10,6 +10,7 @@ import { CTA } from '../components/landing/CTA';
 import { PlatformOverview } from '../components/landing/PlatformOverview';
 import { HardwareSection } from '../components/landing/HardwareSection';
 import { WhereWeFit } from '../components/landing/WhereWeFit';
+import { SecurityStrip } from '../components/landing/SecurityStrip';
 import { FAQ } from '../components/landing/FAQ';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
@@ -47,6 +48,7 @@ export function Landing() {
       <Architecture />
       <HowItWorks />
       <Pricing />
+      <SecurityStrip />
       <Testimonials />
       <FAQ />
       <CTA />

@@ -90,11 +90,24 @@ The function needs `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (provided by
 the platform). Create a key via Settings → API Keys (or the `create_api_key`
 RPC) and point the reporter/agent at `--url <project-url> --api-key tf_...`.
 
+## 8. Data-protection hardening (added)
+- **api_keys locked down** (`014_security_hardening.sql`): no direct table access
+  over the data API; managed only via SECURITY DEFINER RPCs. Key hashes are never
+  selectable by a tenant, even an org admin.
+- **Audit trail**: append-only `audit_events` (members read, no direct writes)
+  records API key creation/revocation.
+- **Safe listing**: `list_api_keys` RPC returns metadata only (no hash).
+- **Ingestion abuse guards**: payload size cap (~2 MB) and batch-size limits on
+  results/crashes.
+- **Marketing**: `SECURITY.md`, an expanded Trust page ("Security at a glance"),
+  and a landing "Enterprise-grade data protection" strip.
+
 ## Still open (recommended next)
 
-- Wire the Settings "New Key" button to the `create_api_key` RPC for live orgs
-  (currently generates locally for the demo).
-- Per-key permission scopes (read vs write) surfaced in the UI.
+- Wire the Settings "New Key" button to the `create_api_key` / `list_api_keys`
+  RPCs for live orgs (currently generates locally for the demo).
+- Per-key read/write scopes surfaced in the UI.
+- Per-key/IP rate limiting on the ingestion function (size caps are in place).
+- SSO / SAML + SCIM, configurable retention windows (enterprise asks).
 - An end-to-end smoke test against a real project (ingest → dashboard).
-- Rate limiting / payload size caps on the ingestion function.
 - Replace the legacy `/setup` page or merge it into `/docs/setup` to avoid drift.
