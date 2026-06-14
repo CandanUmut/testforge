@@ -30,6 +30,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          # Auto-enable GitHub Pages (source: GitHub Actions) if it isn't already,
+          # which fixes the "Creating Pages deployment failed: Not Found (404)" error.
+          enablement: true
+
       - name: Type check
         run: npx tsc --noEmit
 
