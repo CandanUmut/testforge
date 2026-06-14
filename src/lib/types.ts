@@ -14,6 +14,7 @@ export interface Organization {
   updated_at: string;
 }
 
+
 // ─── Profiles ────────────────────────────────────────────────────────────────
 
 export type UserRole = 'owner' | 'admin' | 'member' | 'viewer';
