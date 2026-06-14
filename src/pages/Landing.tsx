@@ -9,6 +9,8 @@ import { Testimonials } from '../components/landing/Testimonials';
 import { CTA } from '../components/landing/CTA';
 import { PlatformOverview } from '../components/landing/PlatformOverview';
 import { HardwareSection } from '../components/landing/HardwareSection';
+import { WhereWeFit } from '../components/landing/WhereWeFit';
+import { FAQ } from '../components/landing/FAQ';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 
@@ -29,12 +31,15 @@ export function Landing() {
           </h2>
           <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-slate-600">
             Every day, AI-assisted development pushes more code, more commits, and more builds into
-            your pipeline. Test infrastructure has not kept up. QA teams are the last line of defense,
-            and they are drowning. TestForge closes the gap between development velocity and test coverage.
+            your pipeline. Test infrastructure has not kept up — and the bottleneck is no longer
+            running tests, it is <span className="font-semibold text-slate-900">signal-to-noise</span>.
+            QA teams are buried under flaky failures, duplicate crashes, and offline devices.
+            TestForge turns that noise into a prioritized signal so quality keeps pace with velocity.
           </p>
         </div>
       </section>
       <PainPoints />
+      <WhereWeFit />
       <PlatformOverview />
       <Features />
       <HardwareSection />
@@ -43,6 +48,7 @@ export function Landing() {
       <HowItWorks />
       <Pricing />
       <Testimonials />
+      <FAQ />
       <CTA />
       <Footer onSelectSection={scrollToSection} />
     </div>

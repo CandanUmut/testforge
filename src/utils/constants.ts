@@ -1,5 +1,5 @@
 export const APP_NAME = 'TestForge';
-export const APP_DESCRIPTION = 'Test infrastructure that runs itself.';
+export const APP_DESCRIPTION = 'Mission control for your test lab.';
 export const GITHUB_URL = 'https://github.com/candanumut/testforge';
 export const AUTHOR_GITHUB = 'https://github.com/candanumut';
 

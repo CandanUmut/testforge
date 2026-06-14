@@ -20,17 +20,18 @@ export function Footer({ onSelectSection }: FooterProps) {
               <span>Test<span className="text-indigo-600">Forge</span></span>
             </div>
             <p className="mt-4 max-w-sm text-sm leading-7 text-slate-600">
-              Device health, test orchestration, crash triage, and lab operations in one platform for
-              hardware, firmware, and software teams.
+              Mission control for your test lab. Device health, test orchestration, and agentic crash
+              triage in one real-time control plane for hardware, firmware, and device teams.
             </p>
           </div>
 
           <div>
             <p className="text-sm font-semibold text-slate-950">Product</p>
             <div className="mt-4 space-y-3 text-sm text-slate-600">
+              <button type="button" onClick={() => onSelectSection('why-testforge')} className="block transition hover:text-slate-950">Why TestForge</button>
               <button type="button" onClick={() => onSelectSection('features')} className="block transition hover:text-slate-950">Features</button>
-              <button type="button" onClick={() => onSelectSection('architecture')} className="block transition hover:text-slate-950">Architecture</button>
               <button type="button" onClick={() => onSelectSection('pricing')} className="block transition hover:text-slate-950">Pricing</button>
+              <button type="button" onClick={() => onSelectSection('faq')} className="block transition hover:text-slate-950">FAQ</button>
               <Link to={getAppPath('demo')} className="block transition hover:text-slate-950">Demo</Link>
             </div>
           </div>

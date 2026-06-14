@@ -169,17 +169,18 @@ export function Hero() {
       <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
           <p className="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600">
-            Built for hardware, firmware, and software test teams
+            Test lab operations &amp; observability platform
           </p>
           <h1 className="mt-8 text-5xl font-semibold tracking-[-0.06em] text-slate-950 sm:text-6xl lg:text-7xl">
-            Ship faster.
+            Mission control
             <br />
-            Test smarter.
+            for your test lab.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
-            In the AI era, code ships faster than teams can test it. TestForge gives hardware,
-            firmware, and software teams one platform for device management, test orchestration,
-            crash triage, and real-time visibility so quality keeps pace with velocity.
+            AI ships code faster than any QA team can test it. TestForge is the operations layer for
+            hardware, firmware, and device teams — unifying device health, test orchestration, and
+            agentic crash triage in one real-time control plane. Your devices, your data, finally
+            under control.
           </p>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
