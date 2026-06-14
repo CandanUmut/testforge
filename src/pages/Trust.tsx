@@ -10,6 +10,7 @@ import {
   FileCheck2,
   ArrowRight,
   Mail,
+  Check,
 } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
@@ -29,7 +30,7 @@ const pillars = [
   {
     title: 'Authentication & access control',
     icon: KeyRound,
-    copy: 'Auth is handled by Supabase with role-based access inside each organization. API access uses scoped keys, and read-only keys are available for CI and reporting integrations.',
+    copy: 'Role-based access inside each organization, plus organization-scoped API keys. Keys are stored only as SHA-256 hashes, shown once, never readable back, and revocable instantly. Writes flow through a gateway that resolves your organization server-side, so cross-tenant writes are structurally impossible.',
   },
   {
     title: 'Built for NDAs & pre-release hardware',
@@ -112,6 +113,36 @@ export function Trust() {
                 </div>
                 <h3 className="mt-6 text-xl font-semibold tracking-tight text-slate-950">{title}</h3>
                 <p className="mt-3 text-sm leading-7 text-slate-600">{copy}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Security at a glance */}
+      <section className="px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl rounded-[28px] border border-slate-200 bg-white p-8 shadow-card sm:p-10">
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-slate-950">Security at a glance</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+            The controls that protect your test and device data — many of them enforced in the data
+            layer, not just the app.
+          </p>
+          <div className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2">
+            {[
+              'Row Level Security isolates every organization at the database layer',
+              'Writes go through a gateway that sets your org server-side — no cross-tenant writes',
+              'API keys stored as SHA-256 hashes, shown once, scoped, expirable, and revocable',
+              'API keys are never readable over the data API — not even by an org admin',
+              'Tamper-evident audit log for key creation and revocation',
+              'TLS in transit; encryption at rest on the managed database',
+              'Payload and batch-size limits guard against resource-exhaustion abuse',
+              'Data minimization — no data resale, no training of external AI models',
+              'Export your data anytime; permanent deletion on request',
+              'On-premise deployment available so data never leaves your network',
+            ].map(item => (
+              <div key={item} className="flex items-start gap-3">
+                <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
+                <p className="text-sm leading-7 text-slate-700">{item}</p>
               </div>
             ))}
           </div>

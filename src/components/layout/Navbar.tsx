@@ -6,6 +6,7 @@ import { PUBLIC_ROUTES, getAppPath } from '../../lib/routes';
 const sectionLinks = [
   { label: 'Why TestForge', id: 'why-testforge' },
   { label: 'Features', id: 'features' },
+  { label: 'Security', id: 'security' },
   { label: 'Pricing', id: 'pricing' },
   { label: 'FAQ', id: 'faq' },
 ];
