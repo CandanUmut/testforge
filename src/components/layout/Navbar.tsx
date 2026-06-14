@@ -4,9 +4,10 @@ import { Menu, X, Zap } from 'lucide-react';
 import { PUBLIC_ROUTES, getAppPath } from '../../lib/routes';
 
 const sectionLinks = [
+  { label: 'Why TestForge', id: 'why-testforge' },
   { label: 'Features', id: 'features' },
-  { label: 'Architecture', id: 'architecture' },
   { label: 'Pricing', id: 'pricing' },
+  { label: 'FAQ', id: 'faq' },
 ];
 
 interface NavbarProps {

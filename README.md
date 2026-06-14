@@ -1,8 +1,10 @@
 # TestForge
 
-**Test infrastructure that runs itself.**
+**Mission control for your test lab.**
 
-TestForge is a universal test automation platform that provides companies with automated test infrastructure, crash triage, log parsing, dashboards, and reporting as a managed service.
+TestForge is the operations and observability platform for hardware, firmware, and device test labs. It unifies device health, test orchestration, and agentic crash triage into one real-time control plane — so quality keeps pace with AI-era development velocity. Your devices, your data.
+
+Unlike cloud device farms (BrowserStack, Sauce Labs) it manages the physical lab you already own, and unlike heavy HIL rigs (NI, dSPACE) it is a lightweight software layer that connects to the test framework you already run. See [`MARKET_RESEARCH.md`](./MARKET_RESEARCH.md) for the full positioning and competitive analysis.
 
 Built by [Umut Candan](https://github.com/candanumut) — 6 years of test automation experience at Samsung Semiconductor.
 

@@ -16,7 +16,8 @@ export function Settings() {
   const [showNewKey, setShowNewKey] = useState<string | null>(null);
 
   function copyKey(prefix: string) {
-    navigator.clipboard.writeText(`${prefix}xxxxxxxxxxxx`);
+    // Only the key prefix is recoverable — the full key is shown once at creation.
+    navigator.clipboard.writeText(prefix);
     setCopiedKey(prefix);
     setTimeout(() => setCopiedKey(null), 2000);
   }
@@ -28,8 +29,10 @@ export function Settings() {
   }
 
   function handleGenerateKey() {
-    const newKey = 'tfk_' + Array.from({ length: 32 }, () =>
-      'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]
+    // Matches the production format (tf_ + 48 hex chars from create_api_key).
+    // In a live org this calls the create_api_key RPC; the demo generates locally.
+    const newKey = 'tf_' + Array.from({ length: 48 }, () =>
+      '0123456789abcdef'[Math.floor(Math.random() * 16)]
     ).join('');
     setShowNewKey(newKey);
   }

@@ -30,16 +30,20 @@ python testforge_reporter.py \
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import os
 import sys
-import uuid
+import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+
+def _now_iso() -> str:
+    """Current UTC time as an ISO 8601 string."""
+    return datetime.now(timezone.utc).isoformat()
 
 try:
     import requests
@@ -197,136 +201,49 @@ def fingerprint_crash(message: str) -> str:
 # ---------------------------------------------------------------------------
 
 class TestForgeAPI:
-    """Thin wrapper around the TestForge Supabase REST API."""
+    """Client for the TestForge ingestion gateway.
+
+    All writes go through a single authenticated endpoint
+    (``/functions/v1/ingest``). The gateway validates the ``tf_`` API key,
+    resolves the organization server-side, and maps this friendly payload onto
+    the internal schema — so clients never deal with table columns, foreign
+    keys, or organization IDs directly.
+    """
 
     def __init__(self, base_url: str, api_key: str, org_id: Optional[str] = None):
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
-        self.org_id = org_id
+        self.org_id = org_id  # retained for backwards compatibility; resolved from the key
+        self.ingest_url = f"{self.base_url}/functions/v1/ingest"
         self.session = requests.Session()
         self.session.headers.update({
-            "apikey": api_key,
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
-            "Prefer": "return=representation",
         })
 
-    def _post(self, table: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        url = f"{self.base_url}/rest/v1/{table}"
-        resp = self.session.post(url, json=payload)
-        if resp.status_code not in (200, 201):
-            logger.error("POST %s failed (%d): %s", url, resp.status_code, resp.text)
-            resp.raise_for_status()
-        data = resp.json()
-        return data[0] if isinstance(data, list) and data else data
-
-    def _patch(self, table: str, query: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        url = f"{self.base_url}/rest/v1/{table}?{query}"
-        resp = self.session.patch(url, json=payload)
-        if resp.status_code not in (200, 204):
-            logger.error("PATCH %s failed (%d): %s", url, resp.status_code, resp.text)
-            resp.raise_for_status()
-        try:
-            data = resp.json()
-            return data[0] if isinstance(data, list) and data else data
-        except Exception:
-            return {}
-
-    # -- Test Runs -------------------------------------------------------
-
-    def create_test_run(
-        self,
-        name: str,
-        suite_name: str,
-        device_name: str = "",
-        firmware_version: str = "",
-        total: int = 0,
-        passed: int = 0,
-        failed: int = 0,
-        skipped: int = 0,
-        duration_seconds: float = 0.0,
-        status: str = "running",
-    ) -> Dict[str, Any]:
-        payload: Dict[str, Any] = {
-            "name": name,
-            "suite_name": suite_name,
-            "status": status,
-            "total_tests": total,
-            "passed": passed,
-            "failed": failed,
-            "skipped": skipped,
-            "duration": round(duration_seconds, 2),
-            "started_at": datetime.now(timezone.utc).isoformat(),
-        }
-        if self.org_id:
-            payload["organization_id"] = self.org_id
-        if device_name:
-            payload["device_name"] = device_name
-        if firmware_version:
-            payload["firmware_version"] = firmware_version
-        run = self._post("test_runs", payload)
-        logger.info("Created test run: %s (id=%s)", name, run.get("id", "?"))
-        return run
-
-    def finish_test_run(self, run_id: str, status: str = "completed") -> Dict[str, Any]:
-        return self._patch(
-            "test_runs",
-            f"id=eq.{run_id}",
-            {
-                "status": status,
-                "completed_at": datetime.now(timezone.utc).isoformat(),
-            },
-        )
-
-    # -- Test Results ----------------------------------------------------
-
-    def push_test_result(
-        self,
-        run_id: str,
-        name: str,
-        status: str,
-        duration_ms: float = 0.0,
-        error_message: str = "",
-        classname: str = "",
-    ) -> Dict[str, Any]:
-        payload: Dict[str, Any] = {
-            "test_run_id": run_id,
-            "name": name,
-            "status": status,
-            "duration_ms": round(duration_ms, 1),
-        }
-        if error_message:
-            payload["error_message"] = error_message[:4000]
-        if classname:
-            payload["classname"] = classname
-        return self._post("test_results", payload)
-
-    # -- Crashes ---------------------------------------------------------
-
-    def report_crash(
-        self,
-        device_name: str,
-        error_message: str,
-        stack_trace: str = "",
-        test_name: str = "",
-        firmware_version: str = "",
-    ) -> Dict[str, Any]:
-        payload: Dict[str, Any] = {
-            "device_name": device_name,
-            "error_message": error_message[:2000],
-            "stack_trace": stack_trace[:8000],
-            "fingerprint": fingerprint_crash(error_message),
-            "detected_at": datetime.now(timezone.utc).isoformat(),
-        }
-        if self.org_id:
-            payload["organization_id"] = self.org_id
-        if test_name:
-            payload["test_name"] = test_name
-        if firmware_version:
-            payload["firmware_version"] = firmware_version
-        crash = self._post("crashes", payload)
-        logger.info("Reported crash: %s", error_message[:80])
-        return crash
+    def ingest(self, payload: Dict[str, Any], *, retries: int = 3) -> Dict[str, Any]:
+        """POST a batch payload to the ingestion gateway, with retry/backoff."""
+        last_exc: Optional[Exception] = None
+        for attempt in range(1, retries + 1):
+            try:
+                resp = self.session.post(self.ingest_url, json=payload, timeout=30)
+                if resp.status_code in (200, 201):
+                    return resp.json()
+                # Client/auth errors are not retryable.
+                if resp.status_code in (400, 401, 403):
+                    logger.error("Ingest rejected (%d): %s", resp.status_code, resp.text)
+                    resp.raise_for_status()
+                logger.warning("Ingest attempt %d/%d failed (%d): %s",
+                               attempt, retries, resp.status_code, resp.text)
+                last_exc = requests.HTTPError(f"{resp.status_code}: {resp.text}")
+            except requests.RequestException as exc:
+                logger.warning("Ingest attempt %d/%d error: %s", attempt, retries, exc)
+                last_exc = exc
+            if attempt < retries:
+                time.sleep(2 ** attempt)  # 2s, 4s, ...
+        if last_exc:
+            raise last_exc
+        return {}
 
     # -- Devices / Heartbeat ---------------------------------------------
 
@@ -337,30 +254,18 @@ class TestForgeAPI:
         battery_level: Optional[int] = None,
         status: str = "online",
     ) -> Dict[str, Any]:
-        payload: Dict[str, Any] = {
+        device: Dict[str, Any] = {
             "name": device_name,
             "status": status,
-            "last_heartbeat": datetime.now(timezone.utc).isoformat(),
+            "last_heartbeat": _now_iso(),
         }
-        if self.org_id:
-            payload["organization_id"] = self.org_id
         if firmware_version:
-            payload["firmware_version"] = firmware_version
+            device["firmware_version"] = firmware_version
         if battery_level is not None:
-            payload["battery_level"] = battery_level
-
-        # Try POST with on-conflict upsert via Prefer header
-        url = f"{self.base_url}/rest/v1/devices"
-        headers = {**self.session.headers, "Prefer": "resolution=merge-duplicates,return=representation"}
-        resp = self.session.post(url, json=payload, headers=headers)
-        if resp.status_code in (200, 201):
-            data = resp.json()
-            logger.info("Device heartbeat updated: %s -> %s", device_name, status)
-            return data[0] if isinstance(data, list) and data else data
-
-        # Fallback: PATCH by name
-        logger.debug("Upsert fallback: PATCHing device by name")
-        return self._patch("devices", f"name=eq.{device_name}", payload)
+            device["battery_level"] = battery_level
+        result = self.ingest({"device": device})
+        logger.info("Device heartbeat sent: %s -> %s", device_name, status)
+        return result
 
 
 # ---------------------------------------------------------------------------
@@ -380,59 +285,68 @@ def push_junit_results(
 
     passed = suite.tests - suite.failures - suite.errors - suite.skipped
     run_status = "passed" if (suite.failures + suite.errors) == 0 else "failed"
+    now = _now_iso()
 
-    # 1. Create the test run
-    run = api.create_test_run(
-        name=f"{suite_name} - {device_name} - {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}",
-        suite_name=suite_name,
-        device_name=device_name,
-        firmware_version=firmware_version,
-        total=suite.tests,
-        passed=passed,
-        failed=suite.failures + suite.errors,
-        skipped=suite.skipped,
-        duration_seconds=suite.time_seconds,
-        status=run_status,
-    )
-    run_id = run.get("id")
-    if not run_id:
-        logger.error("Could not obtain run id — aborting result push")
-        return
-
-    # 2. Push each test result
-    crash_count = 0
+    # Build test results and auto-detect crashes from failure messages.
+    results: List[Dict[str, Any]] = []
+    crashes: List[Dict[str, Any]] = []
     for tc in suite.test_cases:
         error_msg = tc.failure_message or tc.error_message or ""
         error_trace = tc.failure_text or tc.error_text or ""
 
-        api.push_test_result(
-            run_id=run_id,
-            name=tc.name,
-            status=tc.status,
-            duration_ms=tc.time_seconds * 1000,
-            error_message=error_msg,
-            classname=tc.classname,
-        )
+        results.append({
+            "name": tc.name,
+            "classname": tc.classname,
+            "status": tc.status,
+            "duration_ms": round(tc.time_seconds * 1000, 1),
+            "error_message": error_msg or None,
+            "stack_trace": error_trace or None,
+        })
 
-        # 3. Auto-detect crashes from failure messages
         if tc.status in ("failed", "error") and looks_like_crash(error_msg, error_trace):
-            api.report_crash(
-                device_name=device_name,
-                error_message=error_msg,
-                stack_trace=error_trace,
-                test_name=f"{tc.classname}.{tc.name}" if tc.classname else tc.name,
-                firmware_version=firmware_version,
-            )
-            crash_count += 1
+            crashes.append({
+                "device_name": device_name,
+                "error_message": error_msg,
+                "stack_trace": error_trace,
+                "fingerprint": fingerprint_crash(error_msg),
+                "test_name": f"{tc.classname}.{tc.name}" if tc.classname else tc.name,
+                "firmware_version": firmware_version,
+                "detected_at": now,
+            })
 
-    # 4. Mark the run as completed
-    api.finish_test_run(run_id, status=run_status)
+    payload: Dict[str, Any] = {
+        "run": {
+            "name": f"{suite_name} - {device_name} - {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}",
+            "suite_name": suite_name,
+            "status": run_status,
+            "total_tests": suite.tests,
+            "passed": passed,
+            "failed": suite.failures + suite.errors,
+            "skipped": suite.skipped,
+            "duration": round(suite.time_seconds, 2),
+            "device_name": device_name or None,
+            "firmware_version": firmware_version or None,
+            "started_at": now,
+            "completed_at": now,
+        },
+        "results": results,
+        "crashes": crashes,
+    }
+    if device_name:
+        payload["device"] = {
+            "name": device_name,
+            "status": "online",
+            "firmware_version": firmware_version or None,
+            "last_heartbeat": now,
+        }
 
+    resp = api.ingest(payload)
+    run_id = resp.get("run_id") if isinstance(resp, dict) else None
     logger.info(
         "Done: %d results pushed, %d crashes detected (run %s)",
-        len(suite.test_cases),
-        crash_count,
-        run_id,
+        len(results),
+        len(crashes),
+        run_id or "?",
     )
 
 
@@ -538,12 +452,6 @@ def main() -> None:
             suite_name=args.suite_name,
             firmware_version=args.firmware_version,
         )
-        # Also send a heartbeat if a device name was provided
-        if args.device_name:
-            api.upsert_device_heartbeat(
-                device_name=args.device_name,
-                firmware_version=args.firmware_version,
-            )
         return
 
     # -- Nothing to do ---------------------------------------------------

@@ -219,49 +219,47 @@ if __name__ == '__main__':
     args = p.parse_args()
     push(parse_junit(args.junit_xml), args.name, args.suite)`;
 
+// All writes go through the authenticated ingestion endpoint. The server
+// resolves your organization from the tf_ key, so no organization_id is needed.
 const CURL_EXAMPLES = {
-  device: `curl -X POST 'https://YOUR_PROJECT.supabase.co/rest/v1/devices' \\
-  -H "apikey: YOUR_ANON_KEY" \\
-  -H "Authorization: Bearer YOUR_ANON_KEY" \\
+  device: `curl -X POST 'https://YOUR_PROJECT.supabase.co/functions/v1/ingest' \\
+  -H "Authorization: Bearer tf_YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "organization_id": "YOUR_ORG_ID",
-    "name": "Lab Device 01",
-    "device_type": "embedded",
-    "serial_number": "DEV-001",
-    "firmware_version": "1.0.0",
-    "status": "online",
-    "connection_type": "uart"
+    "device": {
+      "name": "Lab Device 01",
+      "device_type": "embedded",
+      "firmware_version": "1.0.0",
+      "status": "online",
+      "connection_type": "uart"
+    }
   }'`,
-  run: `curl -X POST 'https://YOUR_PROJECT.supabase.co/rest/v1/test_runs' \\
-  -H "apikey: YOUR_ANON_KEY" \\
-  -H "Authorization: Bearer YOUR_ANON_KEY" \\
+  run: `curl -X POST 'https://YOUR_PROJECT.supabase.co/functions/v1/ingest' \\
+  -H "Authorization: Bearer tf_YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "organization_id": "YOUR_ORG_ID",
-    "device_id": "DEVICE_UUID_FROM_STEP_ABOVE",
-    "name": "Smoke Test Suite",
-    "suite_name": "smoke",
-    "trigger_type": "manual",
-    "status": "passed",
-    "total_tests": 25,
-    "passed": 23,
-    "failed": 2,
-    "skipped": 0,
-    "duration_ms": 145000,
-    "firmware_version": "1.0.0"
+    "run": {
+      "name": "Smoke Test Suite",
+      "suite_name": "smoke",
+      "status": "passed",
+      "total_tests": 25,
+      "passed": 23,
+      "failed": 2,
+      "skipped": 0,
+      "duration": 145,
+      "device_name": "Lab Device 01",
+      "firmware_version": "1.0.0"
+    }
   }'`,
-  results: `curl -X POST 'https://YOUR_PROJECT.supabase.co/rest/v1/test_results' \\
-  -H "apikey: YOUR_ANON_KEY" \\
-  -H "Authorization: Bearer YOUR_ANON_KEY" \\
+  results: `curl -X POST 'https://YOUR_PROJECT.supabase.co/functions/v1/ingest' \\
+  -H "Authorization: Bearer tf_YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "test_run_id": "TEST_RUN_UUID",
-    "organization_id": "YOUR_ORG_ID",
-    "test_name": "boot_time_under_30s",
-    "test_category": "smoke",
-    "status": "passed",
-    "duration_ms": 1200
+    "run": { "name": "Smoke Test Suite", "suite_name": "smoke", "status": "passed", "total_tests": 25 },
+    "results": [
+      { "name": "boot_time_under_30s", "status": "passed", "duration_ms": 1200, "classname": "smoke.boot" },
+      { "name": "suspend_resume", "status": "failed", "error_message": "Kernel panic at power.c:847" }
+    ]
   }'`,
 };
 
@@ -360,7 +358,7 @@ export function Setup() {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <Terminal size={14} className="text-blue-400" />
-                <p className="text-sm font-semibold text-white">Method A — cURL (direct REST API)</p>
+                <p className="text-sm font-semibold text-white">Method A — cURL (ingestion API)</p>
               </div>
               <div className="space-y-3">
                 <p className="text-xs text-gray-500">Create a run:</p>

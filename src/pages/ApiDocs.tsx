@@ -2,11 +2,10 @@ import { useState, useRef } from 'react';
 import {
   ClipboardCopy,
   KeyRound,
-  Play,
+  UploadCloud,
   Server,
   Smartphone,
   AlertTriangle,
-  Bell,
   Lock,
   ChevronRight,
 } from 'lucide-react';
@@ -15,13 +14,7 @@ import {
 /*  Reusable code block with copy button                              */
 /* ------------------------------------------------------------------ */
 
-function CodeBlock({
-  title,
-  children,
-}: {
-  title?: string;
-  children: string;
-}) {
+function CodeBlock({ title, children }: { title?: string; children: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -60,10 +53,6 @@ function CodeBlock({
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Method badge                                                      */
-/* ------------------------------------------------------------------ */
-
 function MethodBadge({ method }: { method: string }) {
   const colors: Record<string, string> = {
     GET: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -80,10 +69,6 @@ function MethodBadge({ method }: { method: string }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Sidebar nav sections                                              */
-/* ------------------------------------------------------------------ */
-
 interface NavItem {
   id: string;
   label: string;
@@ -92,17 +77,12 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { id: 'authentication', label: 'Authentication', icon: KeyRound },
-  { id: 'test-runs', label: 'Test Runs', icon: Play },
-  { id: 'test-results', label: 'Test Results', icon: Server },
+  { id: 'ingestion', label: 'Ingestion API', icon: UploadCloud },
+  { id: 'querying', label: 'Querying Data', icon: Server },
   { id: 'devices', label: 'Devices', icon: Smartphone },
   { id: 'crashes', label: 'Crashes', icon: AlertTriangle },
-  { id: 'alerts', label: 'Alerts', icon: Bell },
   { id: 'api-keys', label: 'API Keys', icon: Lock },
 ];
-
-/* ------------------------------------------------------------------ */
-/*  Field table                                                       */
-/* ------------------------------------------------------------------ */
 
 function FieldTable({
   fields,
@@ -125,9 +105,7 @@ function FieldTable({
               <td className="px-4 py-2.5">
                 <code className="font-mono text-xs text-slate-800">{f.name}</code>
                 {f.required && (
-                  <span className="ml-1.5 text-[10px] font-semibold uppercase text-red-500">
-                    required
-                  </span>
+                  <span className="ml-1.5 text-[10px] font-semibold uppercase text-red-500">required</span>
                 )}
               </td>
               <td className="px-4 py-2.5 text-xs text-slate-500">{f.type}</td>
@@ -150,10 +128,7 @@ export function ApiDocs() {
 
   const scrollToSection = (id: string) => {
     setActiveSection(id);
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
@@ -163,14 +138,10 @@ export function ApiDocs() {
           {/* Sidebar */}
           <aside className="hidden lg:block">
             <div className="sticky top-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600">
-                API Reference
-              </p>
-              <h1 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
-                REST API
-              </h1>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600">API Reference</p>
+              <h1 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">TestForge API</h1>
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                Supabase PostgREST endpoints for TestForge.
+                One authenticated endpoint to push results, plus a read API for queries.
               </p>
 
               <nav className="mt-8 space-y-1">
@@ -191,9 +162,9 @@ export function ApiDocs() {
               </nav>
 
               <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-xs font-medium text-slate-500">Base URL</p>
+                <p className="text-xs font-medium text-slate-500">Ingestion endpoint</p>
                 <p className="mt-1 break-all font-mono text-xs text-slate-700">
-                  https://your-project.supabase.co
+                  https://your-project.supabase.co/functions/v1/ingest
                 </p>
               </div>
             </div>
@@ -201,667 +172,399 @@ export function ApiDocs() {
 
           {/* Main content */}
           <main ref={mainRef} className="min-w-0 space-y-16">
+            {/* Two planes callout */}
+            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-6">
+              <h2 className="text-sm font-semibold text-indigo-900">Two ways to talk to TestForge</h2>
+              <ul className="mt-3 space-y-2 text-sm leading-7 text-indigo-800">
+                <li className="flex items-start gap-2">
+                  <ChevronRight className="mt-1.5 h-3.5 w-3.5 flex-none" />
+                  <span>
+                    <strong>Ingestion API</strong> — the write path for CI jobs, the reporter, and the lab
+                    agent. Authenticated with a <code className="font-mono">tf_</code> API key. This is what
+                    you use to push runs, results, crashes, and heartbeats.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ChevronRight className="mt-1.5 h-3.5 w-3.5 flex-none" />
+                  <span>
+                    <strong>Query API</strong> — read-only access to your data over Supabase PostgREST,
+                    authenticated with a Supabase user session (JWT). The dashboard uses this, and so can
+                    your own reporting scripts.
+                  </span>
+                </li>
+              </ul>
+            </div>
+
             {/* ── Authentication ─────────────────────────── */}
             <section id="authentication">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-                Authentication
-              </h2>
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">Authentication</h2>
               <p className="mt-3 text-sm leading-7 text-slate-600">
-                Every request to the TestForge API requires two headers: the Supabase anon key
-                (or your project API key) in the <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">apikey</code> header,
-                and a Bearer token in the <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">Authorization</code> header.
-                You can use either a user JWT (from Supabase Auth) or a TestForge API key.
+                Writes are authenticated with a TestForge API key. Create one from{' '}
+                <strong>Settings → API Keys</strong> (or via the RPC below); it is shown once and starts
+                with <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">tf_</code>. Send
+                it as a Bearer token to the ingestion endpoint — the server resolves your organization from
+                the key, so you never pass an organization ID by hand.
               </p>
 
               <div className="mt-6">
-                <h3 className="text-sm font-semibold text-slate-700">Required Headers</h3>
+                <h3 className="text-sm font-semibold text-slate-700">Ingestion headers</h3>
                 <div className="mt-3">
                   <FieldTable
                     fields={[
-                      { name: 'apikey', type: 'string', required: true, description: 'Your Supabase anon key or TestForge project API key.' },
-                      { name: 'Authorization', type: 'string', required: true, description: 'Bearer token: either a user JWT or a TestForge API key (tf_xxx).' },
-                      { name: 'Content-Type', type: 'string', required: true, description: 'Must be application/json for POST and PATCH requests.' },
-                      { name: 'Prefer', type: 'string', required: false, description: 'Set to return=representation to get the created/updated row in the response.' },
+                      { name: 'Authorization', type: 'string', required: true, description: 'Bearer tf_xxx — your TestForge API key.' },
+                      { name: 'Content-Type', type: 'string', required: true, description: 'application/json' },
                     ]}
                   />
                 </div>
               </div>
 
-              <div className="mt-6 space-y-4">
-                <CodeBlock title="cURL">{`curl -X GET "https://your-project.supabase.co/rest/v1/test_runs?limit=5" \\
-  -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer tf_xxxxxxxxxxxx"`}</CodeBlock>
+              <div className="mt-6">
+                <CodeBlock title="cURL — verify your key">{`curl -X POST "https://your-project.supabase.co/functions/v1/ingest" \\
+  -H "Authorization: Bearer tf_xxxxxxxxxxxx" \\
+  -H "Content-Type: application/json" \\
+  -d '{"device": {"name": "DUT-A001", "status": "online"}}'
 
-                <CodeBlock title="Python (requests)">{`import requests
+# -> { "ok": true, "organization_id": "...", "device": true, ... }`}</CodeBlock>
+              </div>
+
+              <p className="mt-6 text-sm leading-7 text-slate-600">
+                For the <strong>Query API</strong>, pass the Supabase anon key in the{' '}
+                <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">apikey</code> header
+                and a user JWT in the{' '}
+                <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">Authorization</code>{' '}
+                header. Row Level Security scopes every response to the caller's organization automatically.
+              </p>
+            </section>
+
+            {/* ── Ingestion API ──────────────────────────── */}
+            <section id="ingestion">
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">Ingestion API</h2>
+              <p className="mt-3 text-sm leading-7 text-slate-600">
+                A single endpoint accepts a batch describing a test run. Every section is optional, so the
+                same endpoint handles a full run upload, a standalone crash report, or just a device
+                heartbeat. The server maps your payload onto the internal schema and deduplicates crashes by
+                fingerprint.
+              </p>
+
+              <div className="mt-8 rounded-xl border border-slate-200 p-6">
+                <div className="flex items-center gap-3">
+                  <MethodBadge method="POST" />
+                  <code className="font-mono text-sm text-slate-800">/functions/v1/ingest</code>
+                </div>
+
+                <div className="mt-4">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Top-level body</h4>
+                  <div className="mt-2">
+                    <FieldTable
+                      fields={[
+                        { name: 'device', type: 'object', description: 'A device heartbeat (name, status, firmware_version, battery_level).' },
+                        { name: 'run', type: 'object', description: 'The test run summary. Required if you send results.' },
+                        { name: 'results', type: 'object[]', description: 'Individual test case results, attached to the run.' },
+                        { name: 'crashes', type: 'object[]', description: 'Crash reports, fingerprinted and deduplicated server-side.' },
+                      ]}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">run fields</h4>
+                  <div className="mt-2">
+                    <FieldTable
+                      fields={[
+                        { name: 'name', type: 'string', required: true, description: 'Human-readable name for the run.' },
+                        { name: 'suite_name', type: 'string', description: 'Suite identifier (e.g. post-flash-smoke).' },
+                        { name: 'status', type: 'string', description: 'running | passed | failed (normalized server-side).' },
+                        { name: 'total_tests / passed / failed / skipped', type: 'integer', description: 'Run counts.' },
+                        { name: 'duration', type: 'float', description: 'Total duration in seconds (converted to ms).' },
+                        { name: 'device_name', type: 'string', description: 'Device under test (auto-linked / created).' },
+                        { name: 'firmware_version', type: 'string', description: 'Firmware or build version.' },
+                        { name: 'started_at / completed_at', type: 'timestamptz', description: 'ISO 8601 timestamps (default: now).' },
+                      ]}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">results[] fields</h4>
+                  <div className="mt-2">
+                    <FieldTable
+                      fields={[
+                        { name: 'name', type: 'string', required: true, description: 'Test case name.' },
+                        { name: 'status', type: 'string', required: true, description: 'passed | failed | error | skipped | flaky | timeout.' },
+                        { name: 'duration_ms', type: 'float', description: 'Test duration in milliseconds.' },
+                        { name: 'classname', type: 'string', description: 'Test class or module.' },
+                        { name: 'error_message', type: 'string', description: 'Failure message (max 4000 chars).' },
+                        { name: 'stack_trace', type: 'string', description: 'Full trace (max 8000 chars).' },
+                      ]}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">crashes[] fields</h4>
+                  <div className="mt-2">
+                    <FieldTable
+                      fields={[
+                        { name: 'error_message', type: 'string', required: true, description: 'Primary error/title. crash_type is inferred from it.' },
+                        { name: 'device_name', type: 'string', description: 'Device that crashed (auto-linked).' },
+                        { name: 'stack_trace', type: 'string', description: 'Full stack trace or assert log.' },
+                        { name: 'fingerprint', type: 'string', description: 'Dedup hash (auto-generated if omitted).' },
+                        { name: 'crash_type / severity', type: 'string', description: 'Optional overrides; otherwise inferred.' },
+                        { name: 'detected_at', type: 'timestamptz', description: 'ISO 8601 time of detection (default: now).' },
+                      ]}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6 space-y-4">
+                  <CodeBlock title="cURL — full run upload">{`curl -X POST "https://your-project.supabase.co/functions/v1/ingest" \\
+  -H "Authorization: Bearer tf_xxxxxxxxxxxx" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "device": { "name": "DUT-A001", "status": "online", "firmware_version": "v3.2.1" },
+    "run": {
+      "name": "Nightly firmware validation",
+      "suite_name": "post-flash-smoke",
+      "status": "failed",
+      "total_tests": 42, "passed": 40, "failed": 2,
+      "duration": 127.5, "device_name": "DUT-A001", "firmware_version": "v3.2.1"
+    },
+    "results": [
+      { "name": "test_device_boot", "status": "passed", "duration_ms": 3420.5, "classname": "tests.firmware.test_boot" },
+      { "name": "test_suspend_resume", "status": "failed", "error_message": "Kernel panic at power.c:847" }
+    ],
+    "crashes": [
+      { "device_name": "DUT-A001", "error_message": "Kernel panic at power.c:847", "test_name": "test_suspend_resume", "firmware_version": "v3.2.1" }
+    ]
+  }'`}</CodeBlock>
+
+                  <CodeBlock title="Response (200)">{`{
+  "ok": true,
+  "organization_id": "a1b2c3d4-...",
+  "device": true,
+  "run_id": "e5f6g7h8-...",
+  "results": 2,
+  "crashes": 1
+}`}</CodeBlock>
+
+                  <CodeBlock title="Python (requests)">{`import requests
+
+resp = requests.post(
+    "https://your-project.supabase.co/functions/v1/ingest",
+    headers={"Authorization": "Bearer tf_xxxxxxxxxxxx"},
+    json={
+        "device": {"name": "DUT-A001", "status": "online"},
+        "run": {"name": "Smoke", "suite_name": "post-flash-smoke",
+                "status": "passed", "total_tests": 24, "passed": 24},
+    },
+    timeout=30,
+)
+resp.raise_for_status()
+print(resp.json())`}</CodeBlock>
+
+                  <CodeBlock title="Easiest: the reporter script (parses JUnit XML for you)">{`python3 testforge_reporter.py \\
+  --url https://your-project.supabase.co \\
+  --api-key tf_xxxxxxxxxxxx \\
+  --junit-xml results.xml \\
+  --device-name DUT-A001 \\
+  --suite-name post-flash-smoke \\
+  --firmware-version v3.2.1`}</CodeBlock>
+                </div>
+              </div>
+            </section>
+
+            {/* ── Querying Data ──────────────────────────── */}
+            <section id="querying">
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">Querying Data</h2>
+              <p className="mt-3 text-sm leading-7 text-slate-600">
+                Read your data over PostgREST. These calls use the Supabase anon key plus a user JWT; Row
+                Level Security restricts every response to your organization. Base URL:{' '}
+                <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">
+                  https://your-project.supabase.co/rest/v1
+                </code>
+                .
+              </p>
+
+              <div className="mt-8 rounded-xl border border-slate-200 p-6">
+                <div className="flex items-center gap-3">
+                  <MethodBadge method="GET" />
+                  <code className="font-mono text-sm text-slate-800">/test_runs?order=created_at.desc&limit=50</code>
+                </div>
+                <p className="mt-3 text-sm text-slate-600">List recent test runs.</p>
+                <div className="mt-6">
+                  <CodeBlock title="Python (requests)">{`import requests
 
 BASE_URL = "https://your-project.supabase.co"
 HEADERS = {
     "apikey": "YOUR_SUPABASE_ANON_KEY",
-    "Authorization": "Bearer tf_xxxxxxxxxxxx",
-    "Content-Type": "application/json",
-    "Prefer": "return=representation",
+    "Authorization": "Bearer YOUR_USER_JWT",
 }
 
 resp = requests.get(
     f"{BASE_URL}/rest/v1/test_runs",
     headers=HEADERS,
-    params={"limit": 5},
+    params={"order": "created_at.desc", "limit": 50},
 )
-print(resp.json())`}</CodeBlock>
-              </div>
-            </section>
-
-            {/* ── Test Runs ──────────────────────────────── */}
-            <section id="test-runs">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-                Test Runs
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                A test run represents a single execution of a test suite. Create a run before pushing
-                individual results, then update its status when all results are in.
-              </p>
-
-              {/* Create test run */}
-              <div className="mt-8 rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="POST" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/test_runs</code>
-                </div>
-                <p className="mt-3 text-sm text-slate-600">Create a new test run.</p>
-
-                <div className="mt-4">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Request Body</h4>
-                  <div className="mt-2">
-                    <FieldTable
-                      fields={[
-                        { name: 'organization_id', type: 'uuid', required: true, description: 'Your organisation UUID.' },
-                        { name: 'name', type: 'string', required: true, description: 'Human-readable name for the run.' },
-                        { name: 'suite_name', type: 'string', required: true, description: 'Test suite identifier (e.g. post-flash-smoke).' },
-                        { name: 'status', type: 'string', required: true, description: 'One of: running, passed, failed.' },
-                        { name: 'total_tests', type: 'integer', required: false, description: 'Total number of test cases.' },
-                        { name: 'passed', type: 'integer', required: false, description: 'Number of passing tests.' },
-                        { name: 'failed', type: 'integer', required: false, description: 'Number of failing tests.' },
-                        { name: 'skipped', type: 'integer', required: false, description: 'Number of skipped tests.' },
-                        { name: 'duration', type: 'float', required: false, description: 'Total duration in seconds.' },
-                        { name: 'device_name', type: 'string', required: false, description: 'Device that ran the tests.' },
-                        { name: 'firmware_version', type: 'string', required: false, description: 'Firmware or build version.' },
-                        { name: 'started_at', type: 'timestamptz', required: false, description: 'ISO 8601 start time.' },
-                      ]}
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-6 space-y-4">
-                  <CodeBlock title="cURL">{`curl -X POST "https://your-project.supabase.co/rest/v1/test_runs" \\
-  -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer tf_xxxxxxxxxxxx" \\
-  -H "Content-Type: application/json" \\
-  -H "Prefer: return=representation" \\
-  -d '{
-    "organization_id": "ORG_UUID",
-    "name": "Nightly firmware validation",
-    "suite_name": "post-flash-smoke",
-    "status": "running",
-    "total_tests": 42,
-    "device_name": "DUT-A001",
-    "firmware_version": "v3.2.1",
-    "started_at": "2026-04-17T08:00:00Z"
-  }'`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests)">{`resp = requests.post(
-    f"{BASE_URL}/rest/v1/test_runs",
-    headers=HEADERS,
-    json={
-        "organization_id": "ORG_UUID",
-        "name": "Nightly firmware validation",
-        "suite_name": "post-flash-smoke",
-        "status": "running",
-        "total_tests": 42,
-        "device_name": "DUT-A001",
-        "firmware_version": "v3.2.1",
-        "started_at": "2026-04-17T08:00:00Z",
-    },
-)
-run = resp.json()[0]
-print(f"Created run: {run['id']}")`}</CodeBlock>
-
-                  <CodeBlock title="Response (201)">{`[
-  {
-    "id": "a1b2c3d4-...",
-    "organization_id": "ORG_UUID",
-    "name": "Nightly firmware validation",
-    "suite_name": "post-flash-smoke",
-    "status": "running",
-    "total_tests": 42,
-    "passed": 0,
-    "failed": 0,
-    "skipped": 0,
-    "duration": null,
-    "device_name": "DUT-A001",
-    "firmware_version": "v3.2.1",
-    "started_at": "2026-04-17T08:00:00Z",
-    "completed_at": null,
-    "created_at": "2026-04-17T08:00:01Z"
-  }
-]`}</CodeBlock>
-                </div>
-              </div>
-
-              {/* Update test run */}
-              <div className="mt-6 rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="PATCH" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/test_runs?id=eq.{'<id>'}</code>
-                </div>
-                <p className="mt-3 text-sm text-slate-600">
-                  Update a test run (e.g. mark it as completed with final counts).
-                </p>
-
-                <div className="mt-6 space-y-4">
-                  <CodeBlock title="cURL">{`curl -X PATCH "https://your-project.supabase.co/rest/v1/test_runs?id=eq.RUN_UUID" \\
-  -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer tf_xxxxxxxxxxxx" \\
-  -H "Content-Type: application/json" \\
-  -H "Prefer: return=representation" \\
-  -d '{
-    "status": "passed",
-    "passed": 40,
-    "failed": 2,
-    "skipped": 0,
-    "duration": 127.5,
-    "completed_at": "2026-04-17T08:02:07Z"
-  }'`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests)">{`resp = requests.patch(
-    f"{BASE_URL}/rest/v1/test_runs?id=eq.{run_id}",
-    headers=HEADERS,
-    json={
-        "status": "passed",
-        "passed": 40,
-        "failed": 2,
-        "duration": 127.5,
-        "completed_at": "2026-04-17T08:02:07Z",
-    },
-)
-print(resp.json())`}</CodeBlock>
-                </div>
-              </div>
-
-              {/* List test runs */}
-              <div className="mt-6 rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="GET" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/test_runs?order=started_at.desc&limit=50</code>
-                </div>
-                <p className="mt-3 text-sm text-slate-600">
-                  List recent test runs, ordered by start time descending.
-                </p>
-
-                <div className="mt-6 space-y-4">
-                  <CodeBlock title="cURL">{`curl "https://your-project.supabase.co/rest/v1/test_runs?order=started_at.desc&limit=50" \\
-  -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer tf_xxxxxxxxxxxx"`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests)">{`resp = requests.get(
-    f"{BASE_URL}/rest/v1/test_runs",
-    headers=HEADERS,
-    params={
-        "order": "started_at.desc",
-        "limit": 50,
-    },
-)
-runs = resp.json()
-for run in runs:
+for run in resp.json():
     print(f"{run['name']}: {run['status']} ({run['passed']}/{run['total_tests']})")`}</CodeBlock>
                 </div>
               </div>
-            </section>
 
-            {/* ── Test Results ───────────────────────────── */}
-            <section id="test-results">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-                Test Results
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                Individual test case results are linked to a test run. Push one result per test case
-                with its status, duration, and any error message.
-              </p>
-
-              <div className="mt-8 rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="POST" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/test_results</code>
-                </div>
-                <p className="mt-3 text-sm text-slate-600">Push a single test result.</p>
-
-                <div className="mt-4">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Request Body</h4>
-                  <div className="mt-2">
-                    <FieldTable
-                      fields={[
-                        { name: 'test_run_id', type: 'uuid', required: true, description: 'The parent test run ID.' },
-                        { name: 'name', type: 'string', required: true, description: 'Test case name.' },
-                        { name: 'status', type: 'string', required: true, description: 'One of: passed, failed, skipped, error.' },
-                        { name: 'duration_ms', type: 'float', required: false, description: 'Test duration in milliseconds.' },
-                        { name: 'error_message', type: 'string', required: false, description: 'Error/failure message (max 4000 chars).' },
-                        { name: 'classname', type: 'string', required: false, description: 'Test class or module name.' },
-                      ]}
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-6 space-y-4">
-                  <CodeBlock title="cURL">{`curl -X POST "https://your-project.supabase.co/rest/v1/test_results" \\
-  -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer tf_xxxxxxxxxxxx" \\
-  -H "Content-Type: application/json" \\
-  -H "Prefer: return=representation" \\
-  -d '{
-    "test_run_id": "RUN_UUID",
-    "name": "test_device_boot",
-    "status": "passed",
-    "duration_ms": 3420.5,
-    "classname": "tests.firmware.test_boot"
-  }'`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests)">{`resp = requests.post(
-    f"{BASE_URL}/rest/v1/test_results",
-    headers=HEADERS,
-    json={
-        "test_run_id": run_id,
-        "name": "test_device_boot",
-        "status": "passed",
-        "duration_ms": 3420.5,
-        "classname": "tests.firmware.test_boot",
-    },
-)
-print(resp.json())`}</CodeBlock>
-
-                  <CodeBlock title="Response (201)">{`[
-  {
-    "id": "e5f6g7h8-...",
-    "test_run_id": "RUN_UUID",
-    "name": "test_device_boot",
-    "status": "passed",
-    "duration_ms": 3420.5,
-    "error_message": null,
-    "classname": "tests.firmware.test_boot",
-    "created_at": "2026-04-17T08:00:05Z"
-  }
-]`}</CodeBlock>
-                </div>
-              </div>
-
-              {/* List results for a run */}
               <div className="mt-6 rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center gap-3">
                   <MethodBadge method="GET" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/test_results?test_run_id=eq.{'<id>'}</code>
+                  <code className="font-mono text-sm text-slate-800">/test_results?test_run_id=eq.{'<id>'}</code>
                 </div>
-                <p className="mt-3 text-sm text-slate-600">List all results for a specific test run.</p>
-
-                <div className="mt-6 space-y-4">
+                <p className="mt-3 text-sm text-slate-600">
+                  List results for a run. Key columns:{' '}
+                  <code className="font-mono text-xs">test_name</code>,{' '}
+                  <code className="font-mono text-xs">test_class</code>,{' '}
+                  <code className="font-mono text-xs">status</code>,{' '}
+                  <code className="font-mono text-xs">duration_ms</code>,{' '}
+                  <code className="font-mono text-xs">error_message</code>.
+                </p>
+                <div className="mt-6">
                   <CodeBlock title="cURL">{`curl "https://your-project.supabase.co/rest/v1/test_results?test_run_id=eq.RUN_UUID&order=created_at.asc" \\
   -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer tf_xxxxxxxxxxxx"`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests)">{`resp = requests.get(
-    f"{BASE_URL}/rest/v1/test_results",
-    headers=HEADERS,
-    params={
-        "test_run_id": f"eq.{run_id}",
-        "order": "created_at.asc",
-    },
-)
-results = resp.json()
-for r in results:
-    print(f"  {r['status']:>7s}  {r['name']}  ({r['duration_ms']}ms)")`}</CodeBlock>
+  -H "Authorization: Bearer YOUR_USER_JWT"`}</CodeBlock>
                 </div>
               </div>
             </section>
 
             {/* ── Devices ────────────────────────────────── */}
             <section id="devices">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-                Devices
-              </h2>
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">Devices</h2>
               <p className="mt-3 text-sm leading-7 text-slate-600">
-                Register devices and send periodic heartbeats to track their health, firmware version,
-                and battery level.
+                Devices are created and kept fresh automatically when you send a heartbeat or a run through
+                the Ingestion API — no manual registration needed. Query them over the read API.
               </p>
 
-              {/* Register / upsert device */}
-              <div className="mt-8 rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="POST" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/devices</code>
-                </div>
-                <p className="mt-3 text-sm text-slate-600">
-                  Register a new device or update an existing one (use <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">Prefer: resolution=merge-duplicates</code> for upsert).
-                </p>
-
-                <div className="mt-4">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Request Body</h4>
-                  <div className="mt-2">
-                    <FieldTable
-                      fields={[
-                        { name: 'organization_id', type: 'uuid', required: true, description: 'Your organisation UUID.' },
-                        { name: 'name', type: 'string', required: true, description: 'Unique device identifier.' },
-                        { name: 'status', type: 'string', required: false, description: 'One of: online, offline, error (default: online).' },
-                        { name: 'firmware_version', type: 'string', required: false, description: 'Current firmware version.' },
-                        { name: 'battery_level', type: 'integer', required: false, description: 'Battery level 0-100.' },
-                        { name: 'last_heartbeat', type: 'timestamptz', required: false, description: 'ISO 8601 timestamp of this heartbeat.' },
-                      ]}
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-6 space-y-4">
-                  <CodeBlock title="cURL — register device">{`curl -X POST "https://your-project.supabase.co/rest/v1/devices" \\
-  -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer tf_xxxxxxxxxxxx" \\
-  -H "Content-Type: application/json" \\
-  -H "Prefer: return=representation" \\
-  -d '{
-    "organization_id": "ORG_UUID",
-    "name": "DUT-A001",
-    "status": "online",
-    "firmware_version": "v3.2.1",
-    "battery_level": 87,
-    "last_heartbeat": "2026-04-17T08:00:00Z"
-  }'`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests) — heartbeat upsert">{`resp = requests.post(
-    f"{BASE_URL}/rest/v1/devices",
-    headers={
-        **HEADERS,
-        "Prefer": "resolution=merge-duplicates,return=representation",
-    },
-    json={
-        "organization_id": "ORG_UUID",
-        "name": "DUT-A001",
-        "status": "online",
-        "firmware_version": "v3.2.1",
-        "battery_level": 87,
-        "last_heartbeat": "2026-04-17T08:00:00Z",
-    },
-)
-device = resp.json()[0]
-print(f"Device {device['name']}: {device['status']}")`}</CodeBlock>
+              <div className="mt-6">
+                <h3 className="text-sm font-semibold text-slate-700">Device columns</h3>
+                <div className="mt-3">
+                  <FieldTable
+                    fields={[
+                      { name: 'name', type: 'string', description: 'Device identifier (unique within your org).' },
+                      { name: 'status', type: 'string', description: 'online | offline | testing | error | maintenance.' },
+                      { name: 'device_type', type: 'string', description: 'android | ios | embedded | iot | web | desktop | custom.' },
+                      { name: 'firmware_version', type: 'string', description: 'Current firmware/build version.' },
+                      { name: 'connection_type', type: 'string', description: 'usb | adb | uart | ssh | wifi | api | agent.' },
+                      { name: 'last_seen_at', type: 'timestamptz', description: 'Time of the most recent heartbeat.' },
+                      { name: 'metadata', type: 'jsonb', description: 'Extra fields (e.g. battery_level) sent on heartbeat.' },
+                    ]}
+                  />
                 </div>
               </div>
 
-              {/* Update device */}
-              <div className="mt-6 rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="PATCH" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/devices?id=eq.{'<id>'}</code>
-                </div>
-                <p className="mt-3 text-sm text-slate-600">Update a specific device by ID.</p>
-
-                <div className="mt-6 space-y-4">
-                  <CodeBlock title="cURL">{`curl -X PATCH "https://your-project.supabase.co/rest/v1/devices?id=eq.DEVICE_UUID" \\
-  -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer tf_xxxxxxxxxxxx" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "status": "offline",
-    "last_heartbeat": "2026-04-17T09:00:00Z"
-  }'`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests)">{`resp = requests.patch(
-    f"{BASE_URL}/rest/v1/devices?id=eq.{device_id}",
-    headers=HEADERS,
-    json={
-        "status": "offline",
-        "last_heartbeat": "2026-04-17T09:00:00Z",
-    },
-)
-print(resp.status_code)`}</CodeBlock>
-                </div>
-              </div>
-
-              {/* List devices */}
               <div className="mt-6 rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center gap-3">
                   <MethodBadge method="GET" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/devices?order=last_heartbeat.desc</code>
+                  <code className="font-mono text-sm text-slate-800">/devices?order=last_seen_at.desc</code>
                 </div>
                 <p className="mt-3 text-sm text-slate-600">List all devices, most recently active first.</p>
-
                 <div className="mt-6">
-                  <CodeBlock title="cURL">{`curl "https://your-project.supabase.co/rest/v1/devices?order=last_heartbeat.desc" \\
+                  <CodeBlock title="cURL">{`curl "https://your-project.supabase.co/rest/v1/devices?order=last_seen_at.desc" \\
   -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer tf_xxxxxxxxxxxx"`}</CodeBlock>
+  -H "Authorization: Bearer YOUR_USER_JWT"`}</CodeBlock>
+                </div>
+                <p className="mt-4 text-sm text-slate-600">Send a heartbeat through the Ingestion API:</p>
+                <div className="mt-3">
+                  <CodeBlock title="cURL — heartbeat">{`curl -X POST "https://your-project.supabase.co/functions/v1/ingest" \\
+  -H "Authorization: Bearer tf_xxxxxxxxxxxx" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "device": { "name": "DUT-A001", "status": "online", "firmware_version": "v3.2.1", "battery_level": 87 } }'`}</CodeBlock>
                 </div>
               </div>
             </section>
 
             {/* ── Crashes ────────────────────────────────── */}
             <section id="crashes">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-                Crashes
-              </h2>
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">Crashes</h2>
               <p className="mt-3 text-sm leading-7 text-slate-600">
-                Report crashes with stack traces for automatic fingerprinting and grouping. The reporter
-                script detects crash patterns automatically, but you can also report them directly.
+                Report crashes through the Ingestion API; they are fingerprinted and deduplicated
+                automatically (repeat occurrences increment a counter instead of creating noise). Query the
+                grouped crashes over the read API. Key columns:{' '}
+                <code className="font-mono text-xs">title</code>,{' '}
+                <code className="font-mono text-xs">crash_type</code>,{' '}
+                <code className="font-mono text-xs">severity</code>,{' '}
+                <code className="font-mono text-xs">occurrence_count</code>,{' '}
+                <code className="font-mono text-xs">fingerprint</code>.
               </p>
 
               <div className="mt-8 rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center gap-3">
                   <MethodBadge method="POST" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/crashes</code>
+                  <code className="font-mono text-sm text-slate-800">/functions/v1/ingest</code>
                 </div>
-                <p className="mt-3 text-sm text-slate-600">Report a crash event.</p>
-
-                <div className="mt-4">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Request Body</h4>
-                  <div className="mt-2">
-                    <FieldTable
-                      fields={[
-                        { name: 'organization_id', type: 'uuid', required: true, description: 'Your organisation UUID.' },
-                        { name: 'device_name', type: 'string', required: true, description: 'Device that experienced the crash.' },
-                        { name: 'error_message', type: 'string', required: true, description: 'Primary error message (max 2000 chars).' },
-                        { name: 'stack_trace', type: 'string', required: false, description: 'Full stack trace or assert log (max 8000 chars).' },
-                        { name: 'fingerprint', type: 'string', required: false, description: 'Hash for deduplication (auto-generated if omitted).' },
-                        { name: 'test_name', type: 'string', required: false, description: 'Test that triggered the crash.' },
-                        { name: 'firmware_version', type: 'string', required: false, description: 'Firmware version at time of crash.' },
-                        { name: 'detected_at', type: 'timestamptz', required: false, description: 'ISO 8601 timestamp of detection.' },
-                      ]}
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-6 space-y-4">
-                  <CodeBlock title="cURL">{`curl -X POST "https://your-project.supabase.co/rest/v1/crashes" \\
-  -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
+                <p className="mt-3 text-sm text-slate-600">Report a standalone crash.</p>
+                <div className="mt-6">
+                  <CodeBlock title="cURL">{`curl -X POST "https://your-project.supabase.co/functions/v1/ingest" \\
   -H "Authorization: Bearer tf_xxxxxxxxxxxx" \\
   -H "Content-Type: application/json" \\
-  -H "Prefer: return=representation" \\
   -d '{
-    "organization_id": "ORG_UUID",
-    "device_name": "DUT-A001",
-    "error_message": "SIGSEGV in librender.so at 0x7f3a",
-    "stack_trace": "#0 0x7f3a librender.so!RenderFrame\\n#1 0x4012 main!run_loop",
-    "fingerprint": "a1b2c3d4e5f67890",
-    "test_name": "test_render_frame",
-    "firmware_version": "v3.2.1",
-    "detected_at": "2026-04-17T08:01:30Z"
+    "crashes": [{
+      "device_name": "DUT-A001",
+      "error_message": "SIGSEGV in librender.so at 0x7f3a",
+      "stack_trace": "#0 0x7f3a librender.so!RenderFrame\\n#1 0x4012 main!run_loop",
+      "test_name": "test_render_frame",
+      "firmware_version": "v3.2.1"
+    }]
   }'`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests)">{`resp = requests.post(
-    f"{BASE_URL}/rest/v1/crashes",
-    headers=HEADERS,
-    json={
-        "organization_id": "ORG_UUID",
-        "device_name": "DUT-A001",
-        "error_message": "SIGSEGV in librender.so at 0x7f3a",
-        "stack_trace": "#0 0x7f3a librender.so!RenderFrame\\n#1 0x4012 main!run_loop",
-        "fingerprint": "a1b2c3d4e5f67890",
-        "test_name": "test_render_frame",
-        "firmware_version": "v3.2.1",
-        "detected_at": "2026-04-17T08:01:30Z",
-    },
-)
-crash = resp.json()[0]
-print(f"Crash reported: {crash['id']}")`}</CodeBlock>
-
-                  <CodeBlock title="Response (201)">{`[
-  {
-    "id": "c9d0e1f2-...",
-    "organization_id": "ORG_UUID",
-    "device_name": "DUT-A001",
-    "error_message": "SIGSEGV in librender.so at 0x7f3a",
-    "stack_trace": "#0 0x7f3a librender.so!RenderFrame\\n#1 0x4012 main!run_loop",
-    "fingerprint": "a1b2c3d4e5f67890",
-    "test_name": "test_render_frame",
-    "firmware_version": "v3.2.1",
-    "detected_at": "2026-04-17T08:01:30Z",
-    "created_at": "2026-04-17T08:01:31Z"
-  }
-]`}</CodeBlock>
                 </div>
               </div>
 
-              {/* List crashes */}
               <div className="mt-6 rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center gap-3">
                   <MethodBadge method="GET" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/crashes?order=detected_at.desc&limit=100</code>
+                  <code className="font-mono text-sm text-slate-800">/crashes?order=last_seen_at.desc&limit=100</code>
                 </div>
-                <p className="mt-3 text-sm text-slate-600">List recent crash events.</p>
-
+                <p className="mt-3 text-sm text-slate-600">List recent crash groups.</p>
                 <div className="mt-6">
                   <CodeBlock title="Python (requests)">{`resp = requests.get(
     f"{BASE_URL}/rest/v1/crashes",
     headers=HEADERS,
-    params={
-        "order": "detected_at.desc",
-        "limit": 100,
-        "device_name": "eq.DUT-A001",  # optional filter
-    },
+    params={"order": "last_seen_at.desc", "limit": 100},
 )
-crashes = resp.json()
-for c in crashes:
-    print(f"[{c['detected_at']}] {c['device_name']}: {c['error_message'][:60]}")`}</CodeBlock>
-                </div>
-              </div>
-            </section>
-
-            {/* ── Alerts ─────────────────────────────────── */}
-            <section id="alerts">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-                Alerts
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                Configure alert rules to get notified when test pass rates drop, devices go offline,
-                or new crash types appear. Alerts are managed through the dashboard UI, but you can
-                also query them via the API.
-              </p>
-
-              <div className="mt-8 rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="GET" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/alert_rules?order=created_at.desc</code>
-                </div>
-                <p className="mt-3 text-sm text-slate-600">List all configured alert rules.</p>
-
-                <div className="mt-6 space-y-4">
-                  <CodeBlock title="cURL">{`curl "https://your-project.supabase.co/rest/v1/alert_rules?order=created_at.desc" \\
-  -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer tf_xxxxxxxxxxxx"`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests)">{`resp = requests.get(
-    f"{BASE_URL}/rest/v1/alert_rules",
-    headers=HEADERS,
-    params={"order": "created_at.desc"},
-)
-rules = resp.json()
-for rule in rules:
-    print(f"{rule['name']}: {rule['condition']} -> {rule['action']}")`}</CodeBlock>
-                </div>
-              </div>
-
-              <div className="mt-6 rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="POST" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/alert_rules</code>
-                </div>
-                <p className="mt-3 text-sm text-slate-600">Create a new alert rule.</p>
-
-                <div className="mt-6 space-y-4">
-                  <CodeBlock title="cURL">{`curl -X POST "https://your-project.supabase.co/rest/v1/alert_rules" \\
-  -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer tf_xxxxxxxxxxxx" \\
-  -H "Content-Type: application/json" \\
-  -H "Prefer: return=representation" \\
-  -d '{
-    "organization_id": "ORG_UUID",
-    "name": "Low pass rate",
-    "condition": "pass_rate < 80",
-    "action": "email",
-    "enabled": true
-  }'`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests)">{`resp = requests.post(
-    f"{BASE_URL}/rest/v1/alert_rules",
-    headers=HEADERS,
-    json={
-        "organization_id": "ORG_UUID",
-        "name": "Low pass rate",
-        "condition": "pass_rate < 80",
-        "action": "email",
-        "enabled": True,
-    },
-)
-print(resp.json())`}</CodeBlock>
+for c in resp.json():
+    print(f"[{c['severity']}] x{c['occurrence_count']}  {c['title']}")`}</CodeBlock>
                 </div>
               </div>
             </section>
 
             {/* ── API Keys ───────────────────────────────── */}
             <section id="api-keys">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-                API Keys
-              </h2>
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">API Keys</h2>
               <p className="mt-3 text-sm leading-7 text-slate-600">
-                API keys are scoped to an organisation. Create one key per CI system or lab agent
-                so activity is traceable. Keys are prefixed with <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">tf_</code> and
-                can be revoked at any time from the Settings page.
+                API keys are scoped to an organization and prefixed with{' '}
+                <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">tf_</code>. Only a
+                SHA-256 hash is stored — the full key is returned exactly once at creation. Create one per CI
+                system or lab agent so activity stays traceable, and revoke unused keys anytime. The fastest
+                path is <strong>Settings → API Keys</strong> in the dashboard; the same operations are
+                available as RPCs.
               </p>
 
               <div className="mt-8 rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center gap-3">
-                  <MethodBadge method="GET" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/api_keys?order=created_at.desc</code>
+                  <MethodBadge method="POST" />
+                  <code className="font-mono text-sm text-slate-800">/rest/v1/rpc/create_api_key</code>
                 </div>
-                <p className="mt-3 text-sm text-slate-600">List API keys for your organisation.</p>
-
+                <p className="mt-3 text-sm text-slate-600">
+                  Create a key (requires a signed-in user session). The plaintext{' '}
+                  <code className="font-mono text-xs">api_key</code> is only returned here.
+                </p>
                 <div className="mt-6 space-y-4">
-                  <CodeBlock title="cURL">{`curl "https://your-project.supabase.co/rest/v1/api_keys?order=created_at.desc" \\
+                  <CodeBlock title="cURL">{`curl -X POST "https://your-project.supabase.co/rest/v1/rpc/create_api_key" \\
   -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
-  -H "Authorization: Bearer YOUR_USER_JWT"`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests)">{`resp = requests.get(
-    f"{BASE_URL}/rest/v1/api_keys",
-    headers={
-        "apikey": "YOUR_SUPABASE_ANON_KEY",
-        "Authorization": "Bearer YOUR_USER_JWT",
-    },
-    params={"order": "created_at.desc"},
-)
-keys = resp.json()
-for k in keys:
-    print(f"{k['name']}: {k['key_prefix']}... (created {k['created_at']})")`}</CodeBlock>
+  -H "Authorization: Bearer YOUR_USER_JWT" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "p_org_id": "ORG_UUID", "p_name": "GitHub Actions" }'`}</CodeBlock>
 
                   <CodeBlock title="Response (200)">{`[
   {
     "id": "k1l2m3n4-...",
-    "organization_id": "ORG_UUID",
-    "name": "Jenkins CI",
-    "key_prefix": "tf_a1b2c3",
-    "created_at": "2026-04-10T12:00:00Z",
-    "last_used_at": "2026-04-17T07:55:00Z"
+    "name": "GitHub Actions",
+    "api_key": "tf_9f8e7d6c5b4a...",   // shown once — store it now
+    "key_prefix": "tf_9f8e7d"
   }
 ]`}</CodeBlock>
                 </div>
@@ -870,64 +573,41 @@ for k in keys:
               <div className="mt-6 rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center gap-3">
                   <MethodBadge method="POST" />
-                  <code className="font-mono text-sm text-slate-800">/rest/v1/api_keys</code>
+                  <code className="font-mono text-sm text-slate-800">/rest/v1/rpc/revoke_api_key</code>
                 </div>
-                <p className="mt-3 text-sm text-slate-600">
-                  Create a new API key. The full key is only returned once in the response.
-                </p>
-
-                <div className="mt-6 space-y-4">
-                  <CodeBlock title="cURL">{`curl -X POST "https://your-project.supabase.co/rest/v1/api_keys" \\
+                <p className="mt-3 text-sm text-slate-600">Revoke a key by its ID (owner/admin only).</p>
+                <div className="mt-6">
+                  <CodeBlock title="cURL">{`curl -X POST "https://your-project.supabase.co/rest/v1/rpc/revoke_api_key" \\
   -H "apikey: YOUR_SUPABASE_ANON_KEY" \\
   -H "Authorization: Bearer YOUR_USER_JWT" \\
   -H "Content-Type: application/json" \\
-  -H "Prefer: return=representation" \\
-  -d '{
-    "organization_id": "ORG_UUID",
-    "name": "GitHub Actions"
-  }'`}</CodeBlock>
-
-                  <CodeBlock title="Python (requests)">{`resp = requests.post(
-    f"{BASE_URL}/rest/v1/api_keys",
-    headers={
-        "apikey": "YOUR_SUPABASE_ANON_KEY",
-        "Authorization": "Bearer YOUR_USER_JWT",
-        "Content-Type": "application/json",
-        "Prefer": "return=representation",
-    },
-    json={
-        "organization_id": "ORG_UUID",
-        "name": "GitHub Actions",
-    },
-)
-key = resp.json()[0]
-print(f"Save this key — it won't be shown again: {key['key']}")`}</CodeBlock>
+  -d '{ "p_key_id": "KEY_UUID" }'`}</CodeBlock>
                 </div>
               </div>
 
-              {/* Rate limits and best practices */}
+              {/* Best practices */}
               <div className="mt-8 rounded-xl border border-indigo-100 bg-indigo-50/50 p-6">
                 <h3 className="text-sm font-semibold text-indigo-900">Best Practices</h3>
                 <ul className="mt-3 space-y-2 text-sm leading-7 text-indigo-800">
                   <li className="flex items-start gap-2">
                     <ChevronRight className="mt-1.5 h-3.5 w-3.5 flex-none" />
-                    Use one API key per CI system or lab agent so activity is traceable.
+                    Use one API key per CI system or lab agent so activity is traceable and revocable.
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight className="mt-1.5 h-3.5 w-3.5 flex-none" />
-                    Send device heartbeats on a fixed interval (every 5 minutes is recommended) to keep health monitoring accurate.
+                    Store keys as CI secrets or in the agent config file (chmod 600) — never in source control.
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight className="mt-1.5 h-3.5 w-3.5 flex-none" />
-                    Include stack traces and assert logs with crash reports for accurate deduplication.
+                    Send device heartbeats on a fixed interval (every 5 minutes) to keep health monitoring accurate.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <ChevronRight className="mt-1.5 h-3.5 w-3.5 flex-none" />
+                    Include stack traces and assert logs with crashes for accurate fingerprinting and dedup.
                   </li>
                   <li className="flex items-start gap-2">
                     <ChevronRight className="mt-1.5 h-3.5 w-3.5 flex-none" />
                     Always pass firmware_version so you can pinpoint which build introduced a regression.
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <ChevronRight className="mt-1.5 h-3.5 w-3.5 flex-none" />
-                    Rotate API keys periodically and revoke unused keys from the Settings page.
                   </li>
                 </ul>
               </div>
