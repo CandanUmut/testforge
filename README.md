@@ -54,6 +54,14 @@ Built for teams working on unreleased hardware under NDA:
 
 See [`SECURITY.md`](./SECURITY.md) and the in-app **Trust & Security** page (`/trust`) for details.
 
+## Documentation
+
+- [`GO_TO_MARKET.md`](./GO_TO_MARKET.md) — positioning, ICP, pricing, sales motion, launch plan
+- [`MARKET_RESEARCH.md`](./MARKET_RESEARCH.md) — market, competitors, positioning analysis
+- [`PRODUCT_READINESS.md`](./PRODUCT_READINESS.md) — readiness review and fixes
+- [`TESTING.md`](./TESTING.md) — test strategy, how to run, post-deploy smoke test
+- [`SECURITY.md`](./SECURITY.md) — security posture and disclosure
+
 
 
 ## Project Structure
