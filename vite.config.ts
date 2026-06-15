@@ -3,7 +3,9 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/testforge/',
+  // Served under /testforge/ on GitHub Pages; set VITE_BASE=/ for self-hosting
+  // at a domain root (e.g. https://testforge.lab.internal/).
+  base: process.env.VITE_BASE ?? '/testforge/',
   build: {
     outDir: 'dist',
     chunkSizeWarningLimit: 600,

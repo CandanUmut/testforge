@@ -56,6 +56,7 @@ See [`SECURITY.md`](./SECURITY.md) and the in-app **Trust & Security** page (`/t
 
 ## Documentation
 
+- [`SELF_HOSTING.md`](./SELF_HOSTING.md) — run the whole stack on-premise / air-gapped (no data leaves your lab)
 - [`GO_TO_MARKET.md`](./GO_TO_MARKET.md) — positioning, ICP, pricing, sales motion, launch plan
 - [`MARKET_RESEARCH.md`](./MARKET_RESEARCH.md) — market, competitors, positioning analysis
 - [`PRODUCT_READINESS.md`](./PRODUCT_READINESS.md) — readiness review and fixes
