@@ -51,8 +51,12 @@ const pillars = [
 
 const faqs = [
   {
+    q: 'Can we run TestForge entirely on our own servers?',
+    a: 'Yes. The whole stack — database, API, ingestion gateway, and dashboard — is self-hostable on a server inside your lab, including fully air-gapped. Test results, device data, and crash logs never leave your network. See the self-hosting guide in the repository.',
+  },
+  {
     q: 'Where is my test data stored?',
-    a: 'On the managed plans, data is stored in our Supabase-backed cloud. On the Enterprise tier you can deploy entirely on-premise, keeping all test and device data inside your own network.',
+    a: 'On the managed plans, data is stored in our cloud. On the Enterprise / self-hosted tier you deploy entirely on-premise, keeping all test and device data inside your own network.',
   },
   {
     q: 'Do you train AI models on my data?',
