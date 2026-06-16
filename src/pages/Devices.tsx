@@ -118,7 +118,7 @@ export function Devices() {
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
         {statusCounts.map(s => (
-          <div key={s.label} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex items-center justify-between">
+          <div key={s.label} className="bg-white rounded-2xl border border-slate-200 shadow-card p-4 flex items-center justify-between">
             <span className="text-xs text-gray-500">{s.label}</span>
             <span className={`text-xl font-bold ${s.color}`}>{s.count}</span>
           </div>

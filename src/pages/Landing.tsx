@@ -10,6 +10,7 @@ import { CTA } from '../components/landing/CTA';
 import { PlatformOverview } from '../components/landing/PlatformOverview';
 import { HardwareSection } from '../components/landing/HardwareSection';
 import { WhereWeFit } from '../components/landing/WhereWeFit';
+import { Integrations } from '../components/landing/Integrations';
 import { SecurityStrip } from '../components/landing/SecurityStrip';
 import { FAQ } from '../components/landing/FAQ';
 import { Navbar } from '../components/layout/Navbar';
@@ -24,6 +25,7 @@ export function Landing() {
     <div className="min-h-screen bg-white text-slate-950">
       <Navbar onSelectSection={scrollToSection} />
       <Hero />
+      <Integrations />
       <section id="ai-era" className="px-4 py-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl rounded-[32px] border border-slate-200 bg-gradient-to-br from-white via-stone-50 to-slate-50 px-8 py-14 text-center shadow-[0_24px_60px_rgba(15,23,42,0.06)]">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-indigo-600">The AI Era Problem</p>

@@ -92,7 +92,7 @@ export function PassFailChart({ data, loading }: PassFailChartProps) {
   const rangeLabel = `Last ${rangeDays} days`;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 h-80">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6 h-80">
       {/* Header */}
       <div className="flex items-start justify-between mb-5">
         <div>

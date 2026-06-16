@@ -51,7 +51,7 @@ export function Settings() {
       </div>
 
       {/* Organization */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center">
             <Building className="w-4 h-4 text-indigo-600" />
@@ -86,7 +86,7 @@ export function Settings() {
       </div>
 
       {/* Team members */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center">
@@ -132,7 +132,7 @@ export function Settings() {
       </div>
 
       {/* API Keys */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center">
@@ -214,7 +214,7 @@ export function Settings() {
       </div>
 
       {/* Webhooks */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center">
@@ -232,7 +232,7 @@ export function Settings() {
       </div>
 
       {/* Notifications */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center">

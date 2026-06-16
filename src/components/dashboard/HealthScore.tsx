@@ -81,7 +81,7 @@ export function HealthScore({ breakdown }: HealthScoreProps) {
   ];
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col items-center gap-4 relative">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6 flex flex-col items-center gap-4 relative">
       <h3 className="text-sm font-semibold text-gray-900 self-start">Test Health Score</h3>
 
       {/* Gauge */}

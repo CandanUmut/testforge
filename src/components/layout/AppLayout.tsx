@@ -16,12 +16,29 @@ import {
 
 // ─── Inner layout (needs access to the context hooks) ────────────────────────
 
+const PAGE_TITLES: Record<string, string> = {
+  dashboard: 'Dashboard',
+  'test-runs': 'Test Runs',
+  'crash-triage': 'Crash Triage',
+  logs: 'Log Explorer',
+  devices: 'Devices',
+  reports: 'Reports',
+  settings: 'Settings',
+};
+
+function titleForPath(pathname: string): string {
+  const segments = pathname.split('/').filter(Boolean); // e.g. ['demo','test-runs']
+  const section = segments[1] || segments[0] || 'dashboard';
+  return PAGE_TITLES[section] ?? 'Dashboard';
+}
+
 function AppLayoutInner() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { isDemoMode } = useDataContext();
   const location = useLocation();
   const { setOpen: openPalette } = useCommandPalette();
   const { unreadCount, setOpen: openNotifications } = useNotifications();
+  const pageTitle = titleForPath(location.pathname);
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -60,47 +77,43 @@ function AppLayoutInner() {
         )}
 
         {/* Top bar */}
-        <header className="h-14 border-b border-gray-200 bg-white flex items-center justify-between px-4 flex-shrink-0">
-          {/* Mobile hamburger */}
-          <button
-            className="lg:hidden text-gray-500 hover:text-gray-900"
-            onClick={() => setMobileOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+        <header className="h-16 border-b border-slate-200 bg-white/80 backdrop-blur-xl flex items-center justify-between gap-4 px-4 sm:px-6 flex-shrink-0">
+          {/* Left: hamburger + page title */}
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              className="lg:hidden text-slate-500 hover:text-slate-900"
+              onClick={() => setMobileOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <h1 className="truncate text-base font-semibold tracking-[-0.01em] text-slate-900">
+              {pageTitle}
+            </h1>
+          </div>
 
-          {/* Spacer on mobile; ⌘K hint on desktop */}
-          <div className="flex-1 flex items-center lg:justify-end">
-            {/* ⌘K hint button — hidden on mobile */}
+          {/* Right-side actions */}
+          <div className="flex items-center gap-2">
+            {/* ⌘K search — hidden on mobile */}
             <button
               onClick={() => openPalette(true)}
-              className="
-                hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg
-                bg-gray-50 hover:bg-gray-100 border border-gray-200
-                text-gray-500 hover:text-gray-700
-                text-xs transition-colors
-                mr-2
-              "
+              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-700 text-xs transition-colors"
               aria-label="Open command palette"
             >
               <Search className="w-3.5 h-3.5" />
               <span>Search</span>
-              <kbd className="ml-1 font-mono tracking-tight text-[10px] text-gray-400">⌘K</kbd>
+              <kbd className="ml-1 rounded border border-slate-200 bg-white px-1 font-mono tracking-tight text-[10px] text-slate-400">⌘K</kbd>
             </button>
-          </div>
 
-          {/* Right-side actions */}
-          <div className="flex items-center gap-3">
             {/* Bell / notification toggle */}
             <button
               onClick={() => openNotifications(true)}
-              className="relative text-gray-500 hover:text-gray-900 transition-colors"
+              className="relative flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
               aria-label="Open notifications"
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] flex items-center justify-center font-bold">
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] flex items-center justify-center font-bold ring-2 ring-white">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}

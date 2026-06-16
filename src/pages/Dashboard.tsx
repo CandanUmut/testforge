@@ -16,13 +16,19 @@ export function Dashboard() {
   const { runs, loading: runsLoading } = useTestRuns({ limit: 10 });
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-5 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto">
       {/* Page header */}
-      <div>
-        <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          {organization?.name || 'TestForge'} — Overview
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-slate-900">Overview</h2>
+          <p className="text-sm text-slate-500 mt-1">
+            {organization?.name || 'TestForge'} · lab health at a glance
+          </p>
+        </div>
+        <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-500 shadow-card-sm">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          Live
+        </span>
       </div>
 
       {/* KPI cards */}

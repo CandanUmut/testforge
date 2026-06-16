@@ -73,7 +73,7 @@ export function ActivityTimeline() {
   const events = getActivityTimeline();
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col h-full">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6 flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-semibold text-gray-900">Recent Activity</h3>
