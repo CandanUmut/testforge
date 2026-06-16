@@ -71,7 +71,7 @@ export function TestRuns() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex flex-wrap items-center gap-3">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-4 flex flex-wrap items-center gap-3">
         <Filter className="w-4 h-4 text-gray-400" />
         <div className="flex flex-wrap gap-2">
           {statusOptions.map(s => (
@@ -99,7 +99,7 @@ export function TestRuns() {
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <LoadingSpinner />

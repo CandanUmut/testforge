@@ -87,7 +87,7 @@ function OccurrenceTimeline({ crash }: { crash: Crash }) {
   const barHeight = 40;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-5">
       <h3 className="text-sm font-semibold text-gray-900 mb-4">Occurrence Timeline</h3>
 
       <div className="overflow-x-auto">
@@ -169,7 +169,7 @@ function StatusStepper({ status }: { status: string }) {
   const currentIndex = WORKFLOW_STEPS.findIndex(s => s.key === effectiveStatus);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-5">
       <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
         Status Workflow
       </h3>
@@ -253,7 +253,7 @@ function RelatedCrashes({ crash }: { crash: Crash }) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-5">
       <h3 className="text-sm font-semibold text-gray-900 mb-3">Similar Crashes</h3>
       <div className="space-y-2">
         {related.map(r => (
@@ -291,7 +291,7 @@ export function CrashDetail({ crash }: CrashDetailProps) {
   return (
     <div className="h-full overflow-y-auto space-y-4 pr-1">
       {/* Header */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-5">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
           <h2 className="text-base font-semibold text-gray-900 flex-1">{crash.title}</h2>
           <StatusBadge status={crash.status} />
@@ -412,7 +412,7 @@ export function CrashDetail({ crash }: CrashDetailProps) {
 
       {/* Stack Trace */}
       {crash.stack_trace && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-200">
             <h3 className="text-sm font-semibold text-gray-900">Stack Trace</h3>
           </div>

@@ -334,7 +334,7 @@ export function TestRunDetail() {
           <ArrowLeft className="w-4 h-4" />
           Test Runs
         </button>
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 flex flex-col items-center justify-center gap-4 text-center">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-12 flex flex-col items-center justify-center gap-4 text-center">
           <Zap className="w-10 h-10 text-gray-300" />
           <p className="text-lg font-semibold text-gray-900">Run not found</p>
           <p className="text-sm text-gray-500">No test run with ID <span className="font-mono text-gray-700">{id}</span> exists.</p>
@@ -382,7 +382,7 @@ export function TestRunDetail() {
       </div>
 
       {/* Header */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6">
         <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
           <div>
             <h1 className="text-xl font-bold text-gray-900">{run.name}</h1>
@@ -458,7 +458,7 @@ export function TestRunDetail() {
         <div className="lg:col-span-2 space-y-4">
 
           {/* Pass rate donut */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-5">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
               Run Summary
             </h3>
@@ -479,7 +479,7 @@ export function TestRunDetail() {
 
           {/* Device info */}
           {run.device && (
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-5">
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
                 Device
               </h3>
@@ -497,7 +497,7 @@ export function TestRunDetail() {
           )}
 
           {/* CI trigger */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-5">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
               CI / Trigger
             </h3>
@@ -538,7 +538,7 @@ export function TestRunDetail() {
             </Link>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
             <div className="bg-gray-50 font-mono divide-y divide-gray-100">
               {deviceLogs.map(log => (
                 <div

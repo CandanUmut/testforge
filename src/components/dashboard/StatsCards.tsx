@@ -156,12 +156,12 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
       {cards.map((card, i) => {
         const Icon = card.icon;
         return (
-          <div key={i} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-3">
+          <div key={i} className="group bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-slate-300 transition-all duration-200 p-5 flex flex-col gap-3">
             {/* Header: label + icon */}
             <div className="flex items-center justify-between">
-              <p className="text-xs font-medium text-gray-500">{card.label}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">{card.label}</p>
               <div
-                className={`w-8 h-8 rounded-lg border ${card.iconBg} flex items-center justify-center`}
+                className={`w-9 h-9 rounded-xl border ${card.iconBg} flex items-center justify-center`}
               >
                 <Icon className={`w-4 h-4 ${card.color}`} />
               </div>
@@ -169,14 +169,14 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
 
             {/* Value + trend badge */}
             <div className="flex items-end justify-between">
-              <span className="text-2xl font-bold text-gray-900">{card.value}</span>
+              <span className="text-3xl font-semibold tracking-[-0.03em] text-slate-900">{card.value}</span>
               {card.trend !== undefined ? (
                 <TrendBadge value={card.trend} />
               ) : null}
             </div>
 
             {/* 7-point sparkline */}
-            <div className="mt-1 opacity-80">
+            <div className="mt-1 opacity-90">
               <Sparkline data={card.sparkData} color={card.sparkColor} />
             </div>
           </div>

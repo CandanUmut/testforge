@@ -36,9 +36,10 @@ export default {
         '2xl': '16px',
       },
       boxShadow: {
-        card: '0 1px 3px rgba(0,0,0,0.06)',
-        'card-hover': '0 4px 12px rgba(0,0,0,0.1)',
-        'card-lg': '0 8px 30px rgba(0,0,0,0.08)',
+        'card-sm': '0 1px 2px rgba(15,23,42,0.05)',
+        card: '0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06)',
+        'card-hover': '0 6px 16px rgba(15,23,42,0.08), 0 2px 6px rgba(15,23,42,0.04)',
+        'card-lg': '0 12px 32px rgba(15,23,42,0.10), 0 2px 8px rgba(15,23,42,0.04)',
       },
       letterSpacing: {
         tighter: '-0.02em',

@@ -24,7 +24,7 @@ export function AlertsFeed() {
   const { getScopedPath, alerts } = useDataContext();
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
         <div>
           <h3 className="text-sm font-semibold text-gray-900">Recent Alerts</h3>

@@ -20,7 +20,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
 
 export function FailureCategoryPie({ data, loading }: FailureCategoryPieProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 h-80">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6 h-80">
       <div className="mb-6">
         <h3 className="text-sm font-semibold text-gray-900">Failure Categories</h3>
         <p className="text-xs text-gray-500 mt-0.5">Distribution by test suite</p>
